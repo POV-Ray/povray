@@ -6,42 +6,8 @@ nl='
 
 ########################################################################################################################
 #
-# Workarounds for quirks of particular runtime environments.
-
-# A single sed expression to fix line endings, passed to sed via the '-e' option as the last expression to process.
-# By default, this is a no-op expression.
-sed_newline_fix=''
-
-# A function to fix quirky behaviour of 'sed -i', called with a list of all files previously processed by 'sed -i'.
-# By default, this is a no-op function.
-sed_i_fix() { : ; }
-
-case "$(uname -s)" in
-
-   Darwin)
-     echo 'Running on Mac OS X'
-     # no known quirks to work around
-     ;;
-
-   Linux)
-     echo 'Running on Linux'
-     # no known quirks to work around
-     ;;
-
-   CYGWIN*|MINGW32*|MSYS*)
-     echo 'Running on MS Windows'
-     # 'sed' output has LF line endings, but we want CR+LF for consistency.
-     sed_newline_fix='s/$/\r/g'
-     # 'sed -i' sets the edited file to read-only.
-     sed_i_fix() { chmod u+w "$@" ; }
-     ;;
-
-   *)
-     echo 'Running on unidentified OS' 
-     # no known quirks to work around
-     ;;
-
-esac
+# This hook only checks: it never changes a file and never stages anything. A commit that fails a check is refused,
+# with the reason, and it is up to the author to put the file right.
 
 # List of all the directories that contain files which may have an impact on the POV-Ray binary, and are under control
 # of the POV-Ray team, as a regular expression for grep -E to match file names.
@@ -140,115 +106,21 @@ fi
 
 ########################################################################################################################
 #
-# Update prerelease id (trailing numeric portion) if there is any change to the actual program code.
-# We're setting the prerelease id to the number of minutes since 2000-01-01 00:00.
-
-if git diff --cached --name-only | grep -E "$src_dir_pattern|^libraries/" >/dev/null
-then
-  if [ x"$ver_version_h_prerelease" = x"" ]
-  then
-    echo "this does not seem intended to be a prerelease"
-  else
-    prerelease_id=`echo "$ver_version_h_prerelease" | sed 's/^.*[^0-9]\([0-9]*\)$/\1/g'`
-    echo "prerelease id is $prerelease_id"
-    if [ x"$prerelease_id" = x"" ]
-    then
-      echo "no trailing number to auto-increment"
-    elif [ "$prerelease_id" -le "999999" ]
-    then
-      echo "trailing number does not seem to be intended for auto-increment"
-    else
-      y2k=`date -u -d"2000-01-01" +"%s"`
-      timestamp=`date -u +"%s"`
-      prerelease_id=`expr \( "$timestamp" - "$y2k" \) / 60`
-      echo "changes to the POV-Ray code detected, updating prerelease id to $prerelease_id."
-      if git diff --name-only "$versionfile" | grep "$versionfile" >/dev/null
-      then
-        echo "ERROR: Unstaged changes to $versionfile detected, can't safely update prerelease id."
-        exit 1
-      fi
-      if [ -f unix/VERSION ]
-      then
-        if git diff --name-only "unix/VERSION" | grep "unix/VERSION" >/dev/null
-        then
-          echo "ERROR: Unstaged changes to unix/VERSION detected, can't safely update prerelease id."
-          exit 1
-        fi
-      fi
-      sed -i \
-        -e 's/\(#define [ ]*POV_RAY_PRERELEASE [ ]*".*[^0-9]\)[0-9][0-9]*"/\1'"$prerelease_id"'"/g' \
-        -e "$sed_newline_fix" \
-        "$versionfile" >/dev/null 2>/dev/null
-      sed_i_fix "$versionfile"
-      # stage update
-      git add "$versionfile" >/dev/null 2>/dev/null
-      if [ -f unix/VERSION ]
-      then
-        sed -i \
-          -e 's/\([^0-9]\)[0-9][0-9]*$/\1'"$prerelease_id"'/g' \
-          -e "$sed_newline_fix" \
-          unix/VERSION >/dev/null 2>/dev/null
-        sed_i_fix unix/VERSION
-        # stage update
-        git add unix/VERSION >/dev/null 2>/dev/null
-      fi
-    fi
-  fi
-else
-  echo "changes are limited to accompanying files, no need to update POV_RAY_PRERELEASE."
-fi
-
-########################################################################################################################
-#
-# Sanitize & sanity-check changed C/C++ source files:
-# - Update copyright year
-# - Convert leading tabs to spaces (limited)
-# - Trim trailing spaces
+# Sanity-check changed C/C++ source files:
 # - check for presence of copyright statement
 # - check for proper doxygen @file tag
 # - check for tab characters
 
-year=`date -u +"%Y"`
 copytext='\(Copyright [1-2][90][0-9][0-9]-\)20[0-9][0-9]\( Persistence of Vision Raytracer Pty. Ltd.\)'
 
-unstaged=`git diff --name-only`
-
 errors=""
-stage=""
 for fname in `git diff --cached --name-only | grep -E "$src_dir_pattern|^tests/source/" | grep -E "$src_ext_pattern"`
 do
 
   if [ -f "$fname" ]
   then
 
-    echo "Sanitizing $fname"
-
-    if echo "$unstaged" | grep "$fname" >/dev/null 2>/dev/null
-    then
-      errors="$errors$nl$fname: unstaged changes detected, can't safely sanitize file."
-    else
-
-      # Update...
-      # - copyright year
-      # - leading tabs (replace with spaces)
-      # - trailing spaces (remove)
-
-      year=`date -u +"%Y"`
-      sed -i \
-        -e 's/'"$copytext"'/\1'"$year"'\2/g' \
-        -e 's/^\t\t\t\t\t/                    /g' \
-        -e 's/^\t\t\t\t/                /g' \
-        -e 's/^\t\t\t/            /g' \
-        -e 's/^\t\t/        /g' \
-        -e 's/^\t/    /g' \
-        -e 's/ *$//g' \
-        -e "$sed_newline_fix" \
-        "$fname" >/dev/null 2>/dev/null
-
-      # mark updates for staging
-      stage="$stage$nl$fname"
-
-    fi
+    echo "Checking $fname"
 
     # Check for copyright statement
 
@@ -268,7 +140,7 @@ do
       errors="$errors$nl$fname: wrong doxygen '@file ...' tag"
     fi
 
-    # Check for any remaining tab characters
+    # Check for tab characters
 
     if grep "$tab" "$fname" >/dev/null
     then
@@ -283,19 +155,11 @@ do
 
 done
 
-if [ x"$stage" != x"" ]
-then
-  sed_i_fix $stage
-fi
-
 if [ x"$errors" != x"" ]
 then
   echo "$errors"
   exit 1
 fi
-
-# Stage updates
-git add $stage >/dev/null 2>/dev/null
 
 ########################################################################################################################
 #
