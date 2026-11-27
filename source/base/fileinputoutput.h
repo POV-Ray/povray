@@ -170,7 +170,7 @@ class IFileStream : public IStream
 /// This class provides read access to in-memory data in a manner compatible with regular input file
 /// access.
 ///
-/// This class is used to support in-built fonts and cached macros.
+/// This class is used to support in-built fonts, the built-in standard include files and cached macros.
 ///
 class IMemStream : public IStream
 {
@@ -196,6 +196,12 @@ class IMemStream : public IStream
         POV_OFF_T formalStart;
         const unsigned char * start;
         int mUngetBuffer;
+        bool mEndReached;   ///< Whether getline() has looked past the end of the data.
+
+    private:
+
+        int Peek_Byte();
+        void Skip_Byte();
 };
 
 class OStream : public IOBase

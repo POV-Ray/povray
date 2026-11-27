@@ -387,6 +387,8 @@
   <ItemGroup>
     <ClCompile Include="..\..\source\base\colour.cpp" />
     <ClCompile Include="..\..\source\base\data\bluenoise64a.cpp" />
+    <ClCompile Include="..\..\source\base\builtinfiles.cpp" />
+    <ClCompile Include="..\..\source\base\builtinfiles_data.cpp" />
     <ClCompile Include="..\..\source\base\fileinputoutput.cpp" />
     <ClCompile Include="..\..\source\base\fileutil.cpp" />
     <ClCompile Include="..\..\source\base\font\crystal.cpp" />
@@ -449,6 +451,7 @@
     <ClInclude Include="..\..\source\base\colour.h" />
     <ClInclude Include="..\..\source\base\configbase.h" />
     <ClInclude Include="..\..\source\base\data\bluenoise64a.h" />
+    <ClInclude Include="..\..\source\base\builtinfiles.h" />
     <ClInclude Include="..\..\source\base\fileinputoutput.h" />
     <ClInclude Include="..\..\source\base\fileutil.h" />
     <ClInclude Include="..\..\source\base\font\crystal.h" />
