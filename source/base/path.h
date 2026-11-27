@@ -143,6 +143,10 @@ class Path
         ///     If the method returns `false`, the output parameters shall be empty.
         ///
         /// @note
+        ///     Rather than return `false`, an implementation may throw an exception whose message names the path
+        ///     and says what is wrong with it, if it can tell more than that the path is invalid.
+        ///
+        /// @note
         ///     If according to the platform-specific conventions the structure of the path string clearly identifies it
         ///     as a directory name (e.g. a trailing path separator character on Unix systems), the file name element
         ///     shall be set to an empty string. Otherwise, the last element of the path shall invariably be interpreted
