@@ -140,8 +140,9 @@ Paths in this table are relative to `web/`.
   one per render eventually fails with "could not allocate memory". The
   worker is replaced only if POV-Ray crashes or a render does not stop when
   asked.
-- Standard include files and INI files are preloaded into the virtual file
-  system from a data package (`povray.data`). Example scenes are mounted as
+- The standard include files are built into the program and read from
+  memory; they are not in the virtual file system. The bundled INI files are
+  preloaded from a data package (`povray.data`). Example scenes are mounted as
   lazy files under `/povray/scenes`, which are fetched when first read;
   files opened from disk are written to `/work`. Render output goes to
   `/out`.
@@ -166,8 +167,8 @@ The page must be cross-origin isolated (see Running).
                          args: ['+Iscene.pov', '+O/out/', '+W320', '+H240'] });
 
 Each message is an object with a `type` field. File paths are absolute
-paths in POV-Ray's virtual file system. The standard include files are in
-`/povray/include`.
+paths in POV-Ray's virtual file system. The standard include files are built
+into the program; one can be named explicitly as `<builtin>/colors.inc`.
 
 Messages to the worker:
 
