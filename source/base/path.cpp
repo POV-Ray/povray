@@ -38,6 +38,7 @@
 
 // POV-Ray base header files
 #include "base/pov_err.h"
+#include "base/stringutilities.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -253,7 +254,7 @@ bool Path::Empty() const
 void Path::ParsePathString(const UCS2String& p)
 {
     if (!ParsePathString (volume, folders, file, p))
-        throw POV_EXCEPTION_STRING("Invalid path."); // TODO FIXME - properly report path string [trf]
+        throw POV_EXCEPTION(kCannotOpenFileErr, "Invalid path '" + UCS2toASCIIString(p) + "'.");
 }
 
 

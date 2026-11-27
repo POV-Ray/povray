@@ -36,7 +36,10 @@
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
 #include "frontend/filemessagehandler.h"
 
+#include <new>
+
 #include "base/fileinputoutput.h"
+#include "base/stringutilities.h"
 
 #include "frontend/renderfrontend.h"
 
@@ -56,28 +59,69 @@ FileMessageHandler::~FileMessageHandler()
 
 void FileMessageHandler::HandleMessage(const SceneData& sd, POVMSType ident, POVMS_Object& msg, POVMS_Object& result)
 {
-    switch(ident)
+    // The back-end waits for our reply to a find or read request, so an exception must not
+    // escape from here: it would leave the request unanswered until it times out, and the
+    // reason would be lost. Instead the error is returned in the reply (see
+    // RenderBackend::SendFindFile and RenderBackend::SendReadFile).
+    try
     {
-        case kPOVMsgIdent_FindFile:
-            (void)FindFile(sd.searchpaths, msg, result);
-            break;
-        case kPOVMsgIdent_ReadFile:
-            if(ReadFile(sd.searchpaths, msg, result) == true)
-                sd.readfiles.push_back(result);
-            break;
-        case kPOVMsgIdent_CreatedFile:
-            CreatedFile(msg);
-            sd.createdfiles.push_back(msg);
-            break;
+        switch(ident)
+        {
+            case kPOVMsgIdent_FindFile:
+                (void)FindFile(sd.searchpaths, sd.scenepath, sd.inputfile, msg, result);
+                break;
+            case kPOVMsgIdent_ReadFile:
+                if(ReadFile(sd.searchpaths, sd.scenepath, sd.inputfile, msg, result) == true)
+                    sd.readfiles.push_back(result);
+                break;
+            case kPOVMsgIdent_CreatedFile:
+                CreatedFile(msg);
+                sd.createdfiles.push_back(msg);
+                break;
+        }
+    }
+    catch(pov_base::Exception& e)
+    {
+        if (ident == kPOVMsgIdent_CreatedFile)
+            throw;
+        result.SetInt(kPOVAttrib_ErrorNumber, ((e.codevalid() == true) && (e.code() != kNoErr)) ? e.code() : kCannotOpenFileErr);
+        result.SetString(kPOVAttrib_EnglishText, e.what());
+    }
+    catch(std::bad_alloc&)
+    {
+        if (ident == kPOVMsgIdent_CreatedFile)
+            throw;
+        result.SetInt(kPOVAttrib_ErrorNumber, kOutOfMemoryErr);
+        result.SetString(kPOVAttrib_EnglishText, "Out of memory.");
+    }
+    catch(std::exception& e)
+    {
+        if (ident == kPOVMsgIdent_CreatedFile)
+            throw;
+        result.SetInt(kPOVAttrib_ErrorNumber, kCannotOpenFileErr);
+        result.SetString(kPOVAttrib_EnglishText, e.what());
     }
 }
 
-bool FileMessageHandler::FindFile(const list<Path>& lps, POVMS_Object& msg, POVMS_Object& result)
+bool FileMessageHandler::FindFile(const list<Path>& lps, const Path& scenepath, const UCS2String& inputfile, POVMS_Object& msg, POVMS_Object& result)
 {
     POVMS_List files;
     Path path;
 
     msg.Get(kPOVAttrib_ReadFile, files);
+
+    // The back-end asks for the scene file itself in the same way as for the files the scene
+    // names, offering the name as given and with each customary extension appended. The scene's
+    // directory is derived from that same name, so it must not be searched for the scene file:
+    // for a scene named `sub/main.pov` that would try `sub/sub/main.pov`.
+    bool sceneFile = false;
+    for(int i = 1; (i <= files.GetListSize()) && (sceneFile == false); i++)
+    {
+        POVMS_Attribute attr;
+
+        files.GetNth(i, attr);
+        sceneFile = (inputfile.empty() == false) && (attr.GetUCS2String() == inputfile);
+    }
 
     for(int i = 1; i <= files.GetListSize(); i++)
     {
@@ -85,7 +129,27 @@ bool FileMessageHandler::FindFile(const list<Path>& lps, POVMS_Object& msg, POVM
 
         files.GetNth(i, attr);
 
-        path = FindFilePath(lps, Path(attr.GetUCS2String()));
+        UCS2String name(attr.GetUCS2String());
+
+        try
+        {
+            path = FindFilePath(lps, sceneFile ? Path() : scenepath, Path(name));
+        }
+        catch(pov_base::Exception&)
+        {
+            // If the name is not a valid path, report it as the scene gave it rather than with an
+            // extension appended: that is the shortest of the names offered, a prefix of the others.
+            for(int j = 1; j <= files.GetListSize(); j++)
+            {
+                POVMS_Attribute other;
+
+                files.GetNth(j, other);
+                UCS2String othername(other.GetUCS2String());
+                if((othername.size() < name.size()) && (name.compare(0, othername.size(), othername) == 0))
+                    (void)Path(othername); // throws if it is invalid too, naming it
+            }
+            throw;
+        }
 
         if(path.Empty() == false)
             break;
@@ -96,9 +160,11 @@ bool FileMessageHandler::FindFile(const list<Path>& lps, POVMS_Object& msg, POVM
     return (path.Empty() == false);
 }
 
-bool FileMessageHandler::ReadFile(const list<Path>& lps, POVMS_Object& msg, POVMS_Object& result)
+bool FileMessageHandler::ReadFile(const list<Path>& lps, const Path& scenepath, const UCS2String& inputfile, POVMS_Object& msg, POVMS_Object& result)
 {
-    Path path(FindFilePath(lps, Path(msg.GetUCS2String(kPOVAttrib_ReadFile))));
+    UCS2String name(msg.GetUCS2String(kPOVAttrib_ReadFile));
+    bool sceneFile = (inputfile.empty() == false) && (name == inputfile);
+    Path path(FindFilePath(lps, sceneFile ? Path() : scenepath, Path(name)));
 
     if(path.Empty() == false)
         result.SetUCS2String(kPOVAttrib_LocalFile, path().c_str());
@@ -110,7 +176,25 @@ void FileMessageHandler::CreatedFile(POVMS_Object&)
 {
 }
 
-Path FileMessageHandler::FindFilePath(const list<Path>& lps, const Path& f)
+// Tells whether a directory path is empty or names the current directory trivially,
+// i.e. has no volume and consists of `.` components only.
+static bool IsTrivialCurrentDir(const Path& dir)
+{
+    if (dir.HasVolume() == true)
+        return false;
+
+    const UCS2String dot(ASCIItoUCS2String("."));
+    vector<UCS2String> folders(dir.GetAllFolders());
+    for (vector<UCS2String>::const_iterator i(folders.begin()); i != folders.end(); i++)
+    {
+        if (*i != dot)
+            return false;
+    }
+
+    return dir.GetFile().empty();
+}
+
+Path FileMessageHandler::FindFilePath(const list<Path>& lps, const Path& scenepath, const Path& f)
 {
     // check the current working dir (or full path if supplied) first
     // note that if the file doesn't have a path and it is found in the
@@ -118,10 +202,20 @@ Path FileMessageHandler::FindFilePath(const list<Path>& lps, const Path& f)
     if(CheckIfFileExists(f) == true)
         return f;
 
-    // if the path is absolute there's no point in checking the include paths;
-    // given it wasn't found above we can just return an empty path
+    // if the path is absolute there's no point in checking the scene directory or
+    // the include paths; given it wasn't found above we can just return an empty path
     if(f.HasVolume() == true)
         return Path();
+
+    // next check the directory of the scene file, unless that is the current
+    // working dir (which we have already checked above)
+    if (IsTrivialCurrentDir(scenepath) == false)
+    {
+        Path path(scenepath, f);
+
+        if(CheckIfFileExists(path) == true)
+            return path;
+    }
 
     Path path(f);
 

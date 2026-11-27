@@ -210,6 +210,24 @@ void vfeSession::RenderStopped (void)
 // specific files such as a potential povray.ini in the CWD.
 int vfeSession::SetOptions (vfeRenderOptions& opts)
 {
+  m_LastExceptionText.clear();
+  try
+  {
+    return SetOptionsInternal (opts);
+  }
+  catch (pov_base::Exception& e)
+  {
+    // e.g. a file name that is not a valid path; keep the text, which says what is wrong
+    m_LastExceptionText = e.what();
+    m_LastError = e.code();
+    if (m_LastError >= 0)
+      m_LastError = kParamErr;
+    return m_LastError;
+  }
+}
+
+int vfeSession::SetOptionsInternal (vfeRenderOptions& opts)
+{
   int                     err;
   UCS2                    str[POV_FILENAME_BUFFER_CHARS+1]; // TODO FIXME - use a C++ style string instead.
   POVMSObject             obj;
@@ -486,6 +504,7 @@ UCS2String vfeSession::GetUCS2StringOption(const char *OptionName, const UCS2Str
 // the status and error message queues.
 int vfeSession::StartRender()
 {
+  m_LastExceptionText.clear();
   if (m_OptionsSet == false)
     return (m_LastError = vfeRenderOptionsNotSet);
 
@@ -513,6 +532,7 @@ int vfeSession::StartRender()
       m_RenderErrorCode = dynamic_cast<pov_base::Exception *> (&e)->code() ;
     if (m_RenderErrorCode == 0)
       m_RenderErrorCode = -1 ;
+    m_LastExceptionText = e.what();
     m_Failed = true ;
     if (m_HadErrorMessage == false)
     {

@@ -44,6 +44,9 @@
 // Standard C++ header files
 #include <memory>
 
+// System header files
+#include <sys/stat.h>
+
 // POV-Ray base header files
 #include "base/platformbase.h"
 #include "base/pov_err.h"
@@ -363,10 +366,21 @@ bool CheckIfFileExists(const Path& p)
 {
     FILE *tempf = PlatformBase::GetInstance().OpenLocalFile (p().c_str(), "r");
 
-    if (tempf != nullptr)
-        fclose(tempf);
-    else
+    if (tempf == nullptr)
         return false;
+
+#ifdef S_ISDIR
+    // On POSIX systems a directory can be opened like a file, but it is not one that can be
+    // read, so do not report it as one. (On Windows opening a directory fails anyway.)
+    struct stat info;
+    if ((fstat(fileno(tempf), &info) == 0) && S_ISDIR(info.st_mode))
+    {
+        fclose(tempf);
+        return false;
+    }
+#endif
+
+    fclose(tempf);
 
     return true;
 }

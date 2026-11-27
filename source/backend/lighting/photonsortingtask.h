@@ -47,6 +47,12 @@
 // POV-Ray header files (backend module)
 #include "backend/render/rendertask.h"
 
+namespace pov_base
+{
+class IStream;
+class OStream;
+}
+
 namespace pov
 {
 
@@ -77,6 +83,8 @@ class PhotonSortingTask : public RenderTask
         void sortPhotonMap();
         bool save();
         bool load();
+        bool saveMap(pov_base::OStream& f, PhotonMap& map, const char *emptyMessage);
+        bool loadMap(pov_base::IStream& f, PhotonMap& map, int numph);
     private:
         class CooperateFunction : public Trace::CooperateFunctor
         {

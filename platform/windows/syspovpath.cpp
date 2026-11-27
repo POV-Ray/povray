@@ -35,6 +35,13 @@
 
 #include "syspovpath.h"
 
+// Standard C++ header files
+#include <string>
+
+// POV-Ray header files (base module)
+#include "base/pov_err.h"
+#include "base/stringutilities.h"
+
 // this must be the last file included
 #include "base/povdebug.h"
 
@@ -135,9 +142,19 @@ bool Path::ParsePathString (UCS2String& volume, vector<UCS2String>& dirnames, UC
             stash += ':';
             ++i;
 
-            // Currently, we don't support relative paths if a volume is specified.
+            // We don't support relative paths if a volume is specified (drive-relative paths such as `K:dir\file`,
+            // or a bare `K:`, which Windows would resolve against the current directory of that drive).
+            // Say so, rather than leave it to the caller to report a generic invalid path.
             if ((i == path.end()) || !POV_IS_PATH_SEPARATOR(*i))
-                return false;
+            {
+                std::string given(UCS2toASCIIString(path));
+                bool backslashes = (given.find('\\') != std::string::npos) && (given.find('/') == std::string::npos);
+                std::string example(given, 0, 2);
+                example += (backslashes ? "\\path\\to\\" : "/path/to/");
+                example += std::string(given, 2);
+                throw POV_EXCEPTION(kCannotOpenFileErr, "Drive-relative path '" + given + "' is not supported; "
+                                                        "give the full path, such as '" + example + "'.");
+            }
 
             // Stash another path separator (use the canonical one, not the one actually used)
             // to indicate an absolute path.

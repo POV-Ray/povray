@@ -67,6 +67,39 @@ Changed Behaviour
     refused at the start.
   - On platforms that cannot measure per-thread CPU time, the statistics now
     omit the CPU time instead of reporting a nonsensical value.
+  - A file named in a scene (e.g. by `#include` or as an image map) with a
+    relative name is now also looked for in the directory of the scene file,
+    after the current directory and before the library paths. Previously that
+    directory was not searched, so a scene started from another directory
+    (e.g. `povray +I/path/to/scene.pov`, or a scene named by `+I` or an INI
+    file in POV-Ray for Windows) could not find its own include files and
+    images unless they were also on a library path. The current directory is
+    still searched first. As a result, a file present both in the scene's
+    directory and on a library path is now taken from the scene's directory.
+    The scene's directory is taken from the input file name as given; if the
+    scene file itself was found on a library path, that directory is still
+    read relative to the current directory, and may then not be the one the
+    scene is in. The search for the scene file itself is unchanged.
+  - Photon map files (`save_file` and `load_file` in the `photons` block of
+    `global_settings`) are now subject to the I/O restrictions on all
+    platforms, like the other files POV-Ray reads or writes (e.g. `#fopen`
+    files and output images); previously they bypassed them. Where writing is
+    restricted (the default both in POV-Ray for Windows and in the
+    `povray.conf` supplied for Unix), a photon map can now be saved only in the
+    directories that permit writing: in POV-Ray for Windows these include the
+    scene's own directory but not its subdirectories, and the default
+    `povray.conf` permits only `.` (again not its subdirectories) and `/tmp`.
+    Elsewhere the save is refused and the render fails with "IO Restrictions
+    prohibit write access to '<file>'". Where reading is restricted (as with
+    the Unix `povray.conf`), loading is likewise limited to the permitted
+    directories. A relative name is still taken relative to the current
+    directory, which in POV-Ray for Windows is the scene's directory only for a
+    scene it renders as its own source file. On Windows, a drive-relative name
+    such as `K:map.ph` is now refused like all other drive-relative paths. As
+    the restrictions are checked only when the file is opened, a refused save
+    fails the render only after the photons have been shot. The file format is
+    unchanged, but an empty file now fails to load, and a file holding surface
+    photons only (an older format) now loads.
 
 
 New Features
@@ -110,6 +143,10 @@ Miscellaneous:
   - A string set via `Declare` and ending in a backslash caused a read past
     the end of the string.
   - Negative area light sizes could cause writes outside the light's grid.
+  - On Unix, a directory named like a file named in a scene (e.g. an include
+    file) in the current directory or on a library path was taken for that
+    file, and the parse could then hang. Directories are now skipped when
+    looking for files.
   - The `local` and `global` pseudo-dictionaries used an uninitialised value
     when checking for `#local` assignments to non-local dictionary elements.
   - Loading a radiosity cache file could use uninitialised values, and lines
@@ -126,6 +163,26 @@ Miscellaneous:
     for images taller than wide. Neither of the official front ends uses it.
   - Fixed an overflow in the size of the pixel buffer used by real-time
     raytracing for very large images.
+  - Windows: a drive-relative path, i.e. a drive letter and colon not followed
+    by a separator (such as `K:scene.pov`, `K:inc/file.inc`, or a bare `K:`),
+    is not supported, and is now reported as such, naming the path: e.g.
+    "Drive-relative path 'K:main.pov' is not supported; give the full path,
+    such as 'K:/path/to/main.pov'.". Previously the message was "Invalid
+    path." or none at all: the Windows console build printed "Unknown error
+    code" for `+I` or `+O`, and crashed for `+L` or an INI file name, and an
+    `#include` or image file name of that form in a scene waited for a timeout
+    before failing with "Operation timed out.". Other invalid paths are now
+    reported as "Invalid path '<path>'." instead of "Invalid path.".
+  - The text of an error that prevents a render from starting is now shown by
+    the console builds, which used to print "Unknown error code" instead.
+  - A file name in a scene that the front end cannot handle now fails at once
+    with the reason, instead of after a timeout.
+  - In an INI file, an unquoted file name or other word not following `=`
+    lost its first character if that was punctuation such as `.`, `~` or `\`,
+    `/` on Unix, or a non-ASCII byte: e.g. `../scene.pov` was read as
+    `./scene.pov`, `./scene.pov` as `/scene.pov`, and on Unix
+    `/home/user/scene.pov` as the relative `home/user/scene.pov`. Such a word
+    is now read whole, as it is on the command line.
 
 
 Other Noteworthy

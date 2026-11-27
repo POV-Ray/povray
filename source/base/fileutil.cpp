@@ -136,7 +136,8 @@ POV_File_Extensions gPOV_File_Extensions[POV_File_Count] =
     {{ ".rca",  ".RCA",  "",      ""      }}, // POV_File_Data_RCA
     {{ ".log",  ".LOG",  "",      ""      }}, // POV_File_Data_LOG
     {{ ".bak",  ".BAK",  "",      ""      }}, // POV_File_Data_Backup
-    {{ ".ttf",  ".TTF",  "",      ""      }}  // POV_File_Font_TTF
+    {{ ".ttf",  ".TTF",  "",      ""      }}, // POV_File_Font_TTF
+    {{ "",      "",      "",      ""      }}  // POV_File_Data_Photons (no customary extension; never searched for)
 };
 
 /// @todo   merge with @ref gPOV_File_Extensions
@@ -166,7 +167,8 @@ const int gFile_Type_To_Mask [POV_File_Count] =
     NO_FILE,   // POV_File_Data_RCA
     NO_FILE,   // POV_File_Data_LOG
     NO_FILE,   // POV_File_Data_Backup
-    NO_FILE    // POV_File_Font_TTF
+    NO_FILE,   // POV_File_Font_TTF
+    NO_FILE    // POV_File_Data_Photons
 };
 
 int InferFileTypeFromExt(const UCS2String& ext)
