@@ -131,6 +131,7 @@ namespace vfe
       virtual bool ReadFileFromURL(OStream *file, const UCS2String& url, const UCS2String& referrer = UCS2String()) override;
       virtual FILE* OpenLocalFile (const UCS2String& name, const char *mode) override;
       virtual bool AllowLocalFileAccess (const UCS2String& name, const unsigned int fileType, bool write) override;
+      virtual bool ListLocalDirectory (const UCS2String& dir, std::vector<UCS2String>& names) override;
 
     protected:
       vfeSession* m_Session;

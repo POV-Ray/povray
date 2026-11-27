@@ -43,6 +43,7 @@
 #include <new>
 
 // POV-Ray header files (base module)
+#include "base/builtinfiles.h"
 #include "base/fileinputoutput.h"
 #include "base/stringutilities.h"
 
@@ -81,7 +82,7 @@ void FileMessageHandler::HandleMessage(const SceneData& sd, POVMSType ident, POV
         switch(ident)
         {
             case kPOVMsgIdent_FindFile:
-                (void)FindFile(sd.searchpaths, sd.scenepath, sd.inputfile, msg, result);
+                (void)FindFile(sd, msg, result);
                 break;
             case kPOVMsgIdent_ReadFile:
                 if(ReadFile(sd.searchpaths, sd.scenepath, sd.inputfile, msg, result) == true)
@@ -116,61 +117,108 @@ void FileMessageHandler::HandleMessage(const SceneData& sd, POVMSType ident, POV
     }
 }
 
-bool FileMessageHandler::FindFile(const list<Path>& lps, const Path& scenepath, const UCS2String& inputfile, POVMS_Object& msg, POVMS_Object& result)
+bool FileMessageHandler::FindFile(const SceneData& sd, POVMS_Object& msg, POVMS_Object& result)
 {
     POVMS_List files;
-    Path path;
+    std::vector<UCS2String> names;
 
     msg.Get(kPOVAttrib_ReadFile, files);
-
-    // The back-end asks for the scene file itself in the same way as for the files the scene
-    // names, offering the name as given and with each customary extension appended. The scene's
-    // directory is derived from that same name, so it must not be searched for the scene file:
-    // for a scene named `sub/main.pov` that would try `sub/sub/main.pov`.
-    bool sceneFile = false;
-    for(int i = 1; (i <= files.GetListSize()) && (sceneFile == false); i++)
-    {
-        POVMS_Attribute attr;
-
-        files.GetNth(i, attr);
-        sceneFile = (inputfile.empty() == false) && (attr.GetUCS2String() == inputfile);
-    }
 
     for(int i = 1; i <= files.GetListSize(); i++)
     {
         POVMS_Attribute attr;
 
         files.GetNth(i, attr);
+        names.push_back(attr.GetUCS2String());
+    }
 
-        UCS2String name(attr.GetUCS2String());
+    // The back-end asks for the scene file itself in the same way as for the files the scene
+    // names, offering the name as given and with each customary extension appended. The scene's
+    // directory is derived from that same name, so it must not be searched for the scene file:
+    // for a scene named `sub/main.pov` that would try `sub/sub/main.pov`.
+    FindFileRequest request(names);
+    for(std::vector<UCS2String>::const_iterator i(names.begin()); (i != names.end()) && (request.sceneFile == false); i++)
+        request.sceneFile = (sd.inputfile.empty() == false) && (*i == sd.inputfile);
+
+    // a `file_exists()` probe reports no error, so it gets no notes either
+    request.probe = msg.TryGetBool(kPOVAttrib_FindFileProbe, false);
+
+    UCS2String found;
+
+    // In disk mode, a file read from the built-in set (which can only happen by its explicit
+    // pseudo-path) takes the standard files it includes by their bare names from the built-in
+    // set too, so that it is never mixed with an older or partial set on disk. In built-in mode
+    // the usual order below already ends with the built-in set, and a project's own copy in
+    // the current directory or the scene's directory still comes first.
+    BuiltinIncludesJob* job = sd.builtinIncludes.get();
+    if((job != nullptr) && (job->mode == BuiltinIncludesJob::kDisk) && msg.TryGetBool(kPOVAttrib_FromBuiltinFile, false))
+    {
+        for(std::vector<UCS2String>::const_iterator i(names.begin()); (i != names.end()) && found.empty(); i++)
+        {
+            const BuiltinFileEntry* entry = pov_base::FindBuiltinFile(*i);
+            if(entry != nullptr)
+                found = BuiltinFilePath(*entry);
+        }
+    }
+
+    if(found.empty() == true)
+        found = FindOnDisk(sd, sd.searchpaths, request);
+
+    // only if none of the names is found on disk
+    if(found.empty() == true)
+        found = FindBuiltinCopy(sd, request);
+
+    result.SetUCS2String(kPOVAttrib_ReadFile, found.c_str());
+
+    return (found.empty() == false);
+}
+
+UCS2String FileMessageHandler::FindOnDisk(const SceneData& sd, const list<Path>& lps, const FindFileRequest& request)
+{
+    const std::vector<UCS2String>& names(request.names);
+
+    for(std::vector<UCS2String>::const_iterator i(names.begin()); i != names.end(); i++)
+    {
+        const UCS2String& name(*i);
+
+        // a pseudo-path such as `<builtin>/colors.inc` always means the built-in copy
+        if(IsBuiltinFilePath(name) == true)
+            continue;
+
+        Path path;
 
         try
         {
-            path = FindFilePath(lps, sceneFile ? Path() : scenepath, Path(name));
+            path = FindFilePath(lps, request.sceneFile ? Path() : sd.scenepath, Path(name));
         }
         catch(pov_base::Exception&)
         {
             // If the name is not a valid path, report it as the scene gave it rather than with an
             // extension appended: that is the shortest of the names offered, a prefix of the others.
-            for(int j = 1; j <= files.GetListSize(); j++)
+            for(std::vector<UCS2String>::const_iterator j(names.begin()); j != names.end(); j++)
             {
-                POVMS_Attribute other;
-
-                files.GetNth(j, other);
-                UCS2String othername(other.GetUCS2String());
-                if((othername.size() < name.size()) && (name.compare(0, othername.size(), othername) == 0))
-                    (void)Path(othername); // throws if it is invalid too, naming it
+                if((j->size() < name.size()) && (name.compare(0, j->size(), *j) == 0))
+                    (void)Path(*j); // throws if it is invalid too, naming it
             }
             throw;
         }
 
         if(path.Empty() == false)
-            break;
+        {
+            NoteBuiltinOverride(sd, name, path, request);
+
+            // A file on disk is never to be mistaken for a built-in one: on Unix `<builtin>`
+            // is a valid directory name, so a relative library path or scene directory of that
+            // name gives a path that starts like a pseudo-path. (On Windows `<` is not valid in
+            // a file name, so this cannot happen there.)
+            UCS2String found(path());
+            if(IsBuiltinFilePath(found) == true)
+                found = ASCIItoUCS2String("./") + found;
+            return found;
+        }
     }
 
-    result.SetUCS2String(kPOVAttrib_ReadFile, path().c_str());
-
-    return (path.Empty() == false);
+    return UCS2String();
 }
 
 bool FileMessageHandler::ReadFile(const list<Path>& lps, const Path& scenepath, const UCS2String& inputfile, POVMS_Object& msg, POVMS_Object& result)
@@ -205,6 +253,113 @@ static bool IsTrivialCurrentDir(const Path& dir)
     }
 
     return dir.GetFile().empty();
+}
+
+/// Prints a note, unless the file is only being probed for (`file_exists()`, which reports no error).
+static void NoteUnlessProbe(BuiltinIncludesJob* job, const SceneData& sd, bool probe, const std::string& key, const std::string& text)
+{
+    if (probe == false)
+        job->Note(sd.console, key, text);
+}
+
+UCS2String FileMessageHandler::FindBuiltinCopy(const SceneData& sd, const FindFileRequest& request)
+{
+    const std::vector<UCS2String>& names(request.names);
+    const bool probe = request.probe;
+    BuiltinIncludesJob* job = sd.builtinIncludes.get();
+    if (job == nullptr)
+        return UCS2String();
+
+    // A pseudo-path names the built-in copy explicitly: it is used in disk mode too, but not
+    // if the built-in files are switched off. Any directory part after the prefix, or a name
+    // that is not that of a built-in file, matches nothing.
+    const UCS2String* given = nullptr;
+    for (std::vector<UCS2String>::const_iterator i(names.begin()); i != names.end(); i++)
+    {
+        if (IsBuiltinFilePath(*i) == false)
+            continue;
+        if ((given == nullptr) || (i->size() < given->size()))
+            given = &(*i); // the name as given is the shortest, a prefix of the others
+
+        const BuiltinFileEntry* entry = FindBuiltinFileByPath(*i);
+        if (entry == nullptr)
+            continue;
+
+        std::string path(UCS2toSysString(BuiltinFilePath(*entry)));
+        if (job->mode == BuiltinIncludesJob::kOff)
+        {
+            NoteUnlessProbe(job, sd, probe, "off:" + path,
+                            "Note: '" + path + "' is not available because the option Builtin_Includes is off.");
+            return UCS2String();
+        }
+        return BuiltinFilePath(*entry);
+    }
+    if (given != nullptr)
+    {
+        std::string path(UCS2toSysString(*given));
+        NoteUnlessProbe(job, sd, probe, "none:" + path, "Note: '" + path + "' does not name a built-in file.");
+        return UCS2String();
+    }
+
+    // the scene file itself is taken from the built-in files only if named explicitly
+    if (request.sceneFile == true)
+        return UCS2String();
+
+    for (std::vector<UCS2String>::const_iterator i(names.begin()); i != names.end(); i++)
+    {
+        const BuiltinFileEntry* entry = pov_base::FindBuiltinFile(*i);
+        if (entry == nullptr)
+            continue;
+
+        std::string name(entry->name);
+        switch (job->mode)
+        {
+            case BuiltinIncludesJob::kBuiltin:
+                return BuiltinFilePath(*entry);
+
+            case BuiltinIncludesJob::kDisk:
+                NoteUnlessProbe(job, sd, probe, "disk:" + name,
+                                "Note: the built-in copy of '" + name + "' was not used because an include directory was found at '" +
+                                UCS2toSysString(job->includeDir) + "' (see the option Builtin_Includes).");
+                break;
+
+            case BuiltinIncludesJob::kOff:
+                NoteUnlessProbe(job, sd, probe, "off:" + name,
+                                "Note: the built-in copy of '" + name + "' was not used because the option Builtin_Includes is off.");
+                break;
+
+            default:
+                break;
+        }
+        return UCS2String();
+    }
+
+    return UCS2String();
+}
+
+void FileMessageHandler::NoteBuiltinOverride(const SceneData& sd, const UCS2String& name, const Path& found, const FindFileRequest& request)
+{
+    BuiltinIncludesJob* job = sd.builtinIncludes.get();
+    if ((job == nullptr) || (job->mode != BuiltinIncludesJob::kBuiltin) || (request.sceneFile == true) || (request.probe == true))
+        return;
+
+    const BuiltinFileEntry* entry = pov_base::FindBuiltinFile(name);
+    if (entry == nullptr)
+        return;
+
+    // only the user's own copy counts, in the current directory or the scene's directory
+    // (FindFilePath() returns these paths in exactly this form), not one on a library path
+    std::string where;
+    if (found() == Path(name)())
+        where = "the current directory";
+    else if ((IsTrivialCurrentDir(sd.scenepath) == false) && (found() == Path(sd.scenepath, Path(name))()))
+        where = "the scene's directory '" + UCS2toSysString(sd.scenepath()) + "'";
+    else
+        return;
+
+    std::string bare(entry->name);
+    job->Note(sd.console, "override:" + bare,
+              "Note: using '" + bare + "' from " + where + " instead of the built-in copy.");
 }
 
 Path FileMessageHandler::FindFilePath(const list<Path>& lps, const Path& scenepath, const Path& f)

@@ -48,6 +48,7 @@
 #include <algorithm>
 
 // POV-Ray header files (base module)
+#include "base/builtinfiles.h"
 #include "base/fileinputoutput.h"
 #include "base/fileutil.h"
 #include "base/path.h"
@@ -10049,10 +10050,12 @@ void Parser::CheckPassThru(ObjectPtr o, int flag)
 *
 ******************************************************************************/
 
-shared_ptr<IStream> Parser::Locate_File(const UCS2String& filename, unsigned int stype, UCS2String& buffer, bool err_flag)
+shared_ptr<IStream> Parser::Locate_File(const UCS2String& filename, unsigned int stype, UCS2String& buffer, bool err_flag, bool fromBuiltinFile)
 {
     UCS2String fn(filename);
-    UCS2String foundfile(mFileResolver.FindFile(fn, stype));
+    UCS2String foundfile(mFileResolver.FindFile(fn, stype,
+                                                (err_flag ? 0 : FileResolver::kFindFileProbe) |
+                                                (fromBuiltinFile ? FileResolver::kFindFileFromBuiltinFile : 0)));
 
     if(foundfile.empty() == true)
     {
@@ -10068,7 +10071,8 @@ shared_ptr<IStream> Parser::Locate_File(const UCS2String& filename, unsigned int
         // which means one of the appended extensions worked. we need to work out which
         // one and append it to the original filename so we can store it in the cache
         // (since it's that name that the cache search routine looks for).
-        UCS2String ext = GetFileExtension(Path(foundfile));
+        // (a built-in file's pseudo-path is not a path, but its extension is found the same way)
+        UCS2String ext = GetFileExtension(Path(IsBuiltinFilePath(foundfile) ? foundfile.substr(foundfile.find('/') + 1) : foundfile));
         if (ext.size() != 0)
             fn += ext;
     }

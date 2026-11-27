@@ -171,6 +171,35 @@ namespace vfePlatform
     pov_base::Filesystem::DeleteFile(filename);
   }
 
+  /////////////////////////////////////////////////////////////////////////
+  // names are converted as for opening files (see vfeFOpen() in vfe.cpp)
+  bool vfeWinSession::ListDirectory(const UCS2String& dir, std::vector<UCS2String>& names) const
+  {
+    names.clear();
+    std::string pattern (UCS2toSysString (dir));
+    if (!pattern.empty() && pattern.back() != '\\' && pattern.back() != '/' && pattern.back() != ':')
+      pattern += '\\';
+    pattern += '*';
+    WIN32_FIND_DATAA data;
+    HANDLE h = FindFirstFileA (pattern.c_str(), &data);
+    // a directory that is not there is empty; one that cannot be listed (e.g. a share that
+    // allows traversal only) may still have files that can be opened by name, so the caller
+    // looks for them
+    if (h == INVALID_HANDLE_VALUE)
+    {
+      DWORD err = GetLastError();
+      return ((err == ERROR_FILE_NOT_FOUND) || (err == ERROR_PATH_NOT_FOUND) || (err == ERROR_DIRECTORY) || (err == ERROR_INVALID_NAME) ||
+              (err == ERROR_BAD_NETPATH) || (err == ERROR_BAD_NET_NAME));
+    }
+    do
+    {
+      if (strcmp (data.cFileName, ".") != 0 && strcmp (data.cFileName, "..") != 0)
+        names.push_back (SysToUCS2String (data.cFileName));
+    } while (FindNextFileA (h, &data));
+    FindClose (h);
+    return true;
+  }
+
   //////////////////////////////////////////////////////////////
   // vfe or POVMS related support functions
   //////////////////////////////////////////////////////////////

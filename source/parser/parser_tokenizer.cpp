@@ -49,6 +49,7 @@
 #include <limits>
 
 // POV-Ray header files (base module)
+#include "base/builtinfiles.h"
 #include "base/fileinputoutput.h"
 #include "base/stringutilities.h"
 #include "base/textstream.h"
@@ -1771,7 +1772,9 @@ void Parser::Open_Include()
     formalFileName = SysToUCS2String(asciiFileName);
     POV_FREE(asciiFileName);
 
-    IncludeHeader(formalFileName);
+    // a file read from the built-in standard include files takes the files it includes
+    // from them too, in preference to the library paths
+    IncludeHeader(formalFileName, IsBuiltinFilePath(mTokenizer.GetInputStreamName()));
 }
 
 //******************************************************************************
@@ -2966,7 +2969,7 @@ int Parser::Parse_For_Param (UTF8String& identifierName, DBL* EndPtr, DBL* StepP
 
 //******************************************************************************
 
-void Parser::IncludeHeader(const UCS2String& formalFileName)
+void Parser::IncludeHeader(const UCS2String& formalFileName, bool fromBuiltinFile)
 {
     UCS2String actualFileName;
 
@@ -2975,10 +2978,11 @@ void Parser::IncludeHeader(const UCS2String& formalFileName)
 
     maIncludeStack.emplace_back(mTokenizer.GetHotBookmark(), int(Cond_Stack.size()), int(maBraceStack.size()));
 
-    shared_ptr<IStream> is = Locate_File (formalFileName.c_str(),POV_File_Text_INC,actualFileName,true);
+    shared_ptr<IStream> is = Locate_File (formalFileName.c_str(),POV_File_Text_INC,actualFileName,true,fromBuiltinFile);
     if (is == nullptr)
         Error ("Cannot open include file %s.", UCS2toSysString(formalFileName).c_str());
 
+    // (the stream of a built-in file is named by its pseudo-path, so messages say where it came from)
     SetInputStream(is);
 
     mSymbolStack.PushTable();

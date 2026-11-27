@@ -273,6 +273,8 @@ enum
     kPOVAttrib_LocalFile             = 'LFil',
     kPOVAttrib_FileURL               = 'FURL',
     kPOVAttrib_CreatedFile           = 'CFil',
+    kPOVAttrib_FindFileProbe         = 'FPrb', ///< (Bool) FindFile: the caller only asks whether the file exists (`file_exists()`), so no error follows if it does not.
+    kPOVAttrib_FromBuiltinFile       = 'FBlt', ///< (Bool) FindFile: the name is included by a file read from the built-in standard include files.
 
     // backend init
     kPOVAttrib_CoreVersion           = 'Core',
@@ -360,6 +362,7 @@ enum
 
     kPOVAttrib_CreateIni             = 'CIni',
     kPOVAttrib_LibraryPath           = 'LibP',
+    kPOVAttrib_BuiltinIncludes       = 'BInc',
     kPOVAttrib_IncludeIni            = 'IncI',
 
     // options handled by scene/parser

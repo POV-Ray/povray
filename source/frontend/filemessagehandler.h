@@ -44,6 +44,8 @@
 
 // C++ standard header files
 #include <list>
+#include <string>
+#include <vector>
 
 // POV-Ray header files (base module)
 #include "base/path_fwd.h"
@@ -66,7 +68,20 @@ class FileMessageHandler
 
         void HandleMessage(const SceneData&, POVMSType, POVMS_Object&, POVMS_Object&);
     protected:
-        virtual bool FindFile(const std::list<pov_base::Path>&, const pov_base::Path&, const pov_base::UCS2String&, POVMS_Object&, POVMS_Object&);
+        /// Looks for a file named in a scene, offered under one or more names (the name
+        /// as given and with customary extensions appended), and returns the name to read
+        /// it by in the reply.
+        ///
+        /// Each name is looked for on disk as by @ref FindFilePath(). If none is found,
+        /// the built-in copy of a standard include file of that name is used, if the
+        /// render job uses the built-in files (see @ref BuiltinIncludesJob); its name in
+        /// the reply is then its pseudo-path, e.g. `<builtin>/colors.inc`. A name that is
+        /// itself a pseudo-path is never looked for on disk. In disk mode, a name of a
+        /// built-in file included by a built-in file (which can only have been named by its
+        /// pseudo-path) means the built-in copy, so that it is not mixed with files on disk.
+        /// A probe (`file_exists()`) prints no notes.
+        ///
+        virtual bool FindFile(const SceneData&, POVMS_Object&, POVMS_Object&);
         virtual bool ReadFile(const std::list<pov_base::Path>&, const pov_base::Path&, const pov_base::UCS2String&, POVMS_Object&, POVMS_Object&);
         virtual void CreatedFile(POVMS_Object&);
 
@@ -82,6 +97,39 @@ class FileMessageHandler
         /// @return             Path to the file, or an empty path if not found.
         ///
         pov_base::Path FindFilePath(const std::list<pov_base::Path>& lps, const pov_base::Path& scenepath, const pov_base::Path& f);
+
+        /// What a FindFile request asks for.
+        struct FindFileRequest
+        {
+            const std::vector<pov_base::UCS2String>& names;   ///< Names the file is offered under.
+            bool sceneFile;     ///< The file is the scene file itself, which can come from the built-in files only by its pseudo-path.
+            bool probe;         ///< Only whether the file exists is asked (`file_exists()`); no error follows, so no notes are printed.
+
+            explicit FindFileRequest(const std::vector<pov_base::UCS2String>& n) : names(n), sceneFile(false), probe(false) {}
+        };
+
+        /// Looks for a file on disk under each of its names in turn, as by @ref FindFilePath().
+        ///
+        /// @param  sd          The scene.
+        /// @param  lps         Library paths to search.
+        /// @param  request     The request.
+        /// @return             Path of the file found, or empty if none is found. A path that
+        ///                     would start like a pseudo-path is given as `./<builtin>/...`.
+        ///
+        pov_base::UCS2String FindOnDisk(const SceneData& sd, const std::list<pov_base::Path>& lps, const FindFileRequest& request);
+
+        /// Looks for the built-in copy of a file not found on disk, printing a note
+        /// if there is one that is not to be used (unless the request is a probe).
+        ///
+        /// @param  sd          The scene.
+        /// @param  request     The request.
+        /// @return             Pseudo-path of the built-in file, or empty if none is to be used.
+        ///
+        pov_base::UCS2String FindBuiltinCopy(const SceneData& sd, const FindFileRequest& request);
+
+        /// Prints a note if a file found on disk in the current directory or the
+        /// scene's directory takes the place of a built-in file of the same name.
+        void NoteBuiltinOverride(const SceneData& sd, const pov_base::UCS2String& name, const pov_base::Path& found, const FindFileRequest& request);
 };
 
 }

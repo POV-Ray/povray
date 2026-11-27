@@ -80,7 +80,7 @@ public:
     /// @name @ref pov_parser::FileResolver related.
     /// @{
 
-    virtual UCS2String FindFile(UCS2String parsedFileName, unsigned int fileType) override;
+    virtual UCS2String FindFile(UCS2String parsedFileName, unsigned int fileType, unsigned int flags = 0) override;
     virtual IStream* ReadFile(const UCS2String& parsedFileName, const UCS2String& foundFileName, unsigned int fileType) override;
     virtual OStream* CreateFile(const UCS2String& parsedFileName, unsigned int fileType, bool append) override;
 

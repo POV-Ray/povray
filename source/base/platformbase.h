@@ -43,7 +43,7 @@
 #include <cstdio>
 
 // C++ standard header files
-//  (none at the moment)
+#include <vector>
 
 // POV-Ray header files (base module)
 #include "base/fileinputoutput_fwd.h"
@@ -101,6 +101,21 @@ public:
     /// @return                 `true` if access is granted, `false` otherwise.
     ///
     virtual bool AllowLocalFileAccess (const UCS2String& name, const unsigned int fileType, bool write) = 0;
+
+    /// List the entries of a local directory.
+    ///
+    /// This method returns the names of the entries of a directory on the local file system, not including `.`
+    /// and `..`, in no particular order. A directory that does not exist or cannot be read is listed as empty.
+    ///
+    /// @note
+    ///     The default implementation does not support listing directories.
+    ///
+    /// @param[in]  dir         Name of the directory, with or without a trailing separator.
+    /// @param[out] names       Names of the entries.
+    /// @return                 `false` if the platform does not support listing directories (and @p names is
+    ///                         then undefined), `true` otherwise.
+    ///
+    virtual bool ListLocalDirectory (const UCS2String& dir, std::vector<UCS2String>& names) { return false; }
 
     static PlatformBase& GetInstance();
 

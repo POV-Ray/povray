@@ -105,9 +105,11 @@ void ParserTask::SendFatalError(Exception& e)
         mpParser->SendFatalError(e);
 }
 
-UCS2String ParserTask::FindFile(UCS2String parsedFileName, unsigned int fileType)
+UCS2String ParserTask::FindFile(UCS2String parsedFileName, unsigned int fileType, unsigned int flags)
 {
-    return mpBackendSceneData->FindFile(GetPOVMSContext(), parsedFileName, fileType);
+    return mpBackendSceneData->FindFile(GetPOVMSContext(), parsedFileName, fileType,
+                                        ((flags & kFindFileProbe) ? BackendSceneData::kFindFileProbe : 0) |
+                                        ((flags & kFindFileFromBuiltinFile) ? BackendSceneData::kFindFileFromBuiltinFile : 0));
 }
 
 IStream* ParserTask::ReadFile(const UCS2String& parsedFileName, const UCS2String& foundFileName, unsigned int fileType)

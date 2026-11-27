@@ -149,6 +149,47 @@ New Features
     written, pixels read) followed by the pixels as 8-bit RGBA, top row first.
     Contributed by Leonardo Zide, who uses it for the live render preview of
     LeoCAD (#344).
+  - The standard include files are built into the program: the 66 files of the
+    `include` directory of the distribution (the `.inc` files, colour maps,
+    images and fonts), so that scenes using them render without POV-Ray being
+    installed. A file a scene names (by `#include`, as an image, font, height
+    field or density file, and so on) is still looked for on disk first, in
+    the current directory, the scene's directory and each library path; only
+    if it is not found there is the built-in copy used. Messages name a
+    built-in file as `<builtin>/colors.inc` (with a forward slash on every
+    platform), including errors and warnings inside it, which give the line in
+    the built-in copy. A copy of a standard file in the current directory or
+    the scene's directory replaces the built-in one for that file alone, and a
+    note says so once per render. To avoid silently mixing an installed set
+    with built-in copies, the decision is made once per render (once for a
+    whole animation): if any library path holds a file named as one of the 40
+    standard `.inc` files (exactly; on Windows, whose file system ignores
+    case, in any case), only files on disk are used, and a standard file that
+    is then missing gives the usual error, preceded by a note that the
+    built-in copy was not used because an include directory was found there.
+    Only the `.inc` files count, so a library path holding, say, only images
+    does not prevent the use of the built-in files. Each library path is
+    listed once per render for this; one that can be searched but not listed
+    is looked in for each of the 40 names. Names are matched against the
+    built-in files exactly, including case, on every platform, so `#include
+    "Colors.inc"` does not find the built-in `colors.inc` (a file system that
+    ignores case still finds an installed copy, as before). A scene can ask
+    for a built-in file explicitly with a name such as `#include
+    "<builtin>/colors.inc"`, which is never looked for on disk and also works
+    when the files on disk are in use; this also works for `Include_Header`
+    and `Input_File_Name`. When the files on disk are in use, a standard file
+    that such a built-in file includes by its bare name (as `textures.inc`
+    includes `finish.inc`) is taken from the built-in set too, so that it is
+    never mixed with an older or partial installed set; when the built-in
+    files are in use, the usual order applies, so a copy in the current
+    directory or the scene's directory still comes first. A name with any
+    further directory part after `<builtin>/` names nothing. The I/O
+    restrictions do not apply to the built-in files.
+  - The new option `Builtin_Includes` (default `on`) can be set to `off` in an
+    INI file or on the command line (`Builtin_Includes=off`) so that the
+    built-in standard include files are never used, not even by explicit
+    `<builtin>/` names; a standard file that is not found on disk then gives
+    the usual error, preceded by a note naming the option.
 
 Performance Improvements
 ------------------------
