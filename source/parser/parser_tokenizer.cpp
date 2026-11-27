@@ -46,6 +46,7 @@
 
 #include <limits>
 
+#include "base/builtinfiles.h"
 #include "base/stringutilities.h"
 #include "base/version_info.h"
 
@@ -2926,6 +2927,11 @@ void Parser::Open_Include()
 
     Echo_Indx = 0;
 
+    // a file read from the built-in standard include files takes the files it includes
+    // from them too, in preference to the library paths
+    bool fromBuiltinFile = (Input_File != nullptr) && (Input_File->In_File != nullptr) &&
+                           IsBuiltinFilePath(UCS2String(Input_File->In_File->name()));
+
     Input_File = &Include_Files[Include_File_Index];
 
     // must set this to `nullptr` in case it's uninitialized - if Locate_File throws an
@@ -2933,14 +2939,15 @@ void Parser::Open_Include()
     // to free In_File if it's not `nullptr`.
     Input_File->In_File = nullptr;
 
-    IStream *is = Locate_File(formalFileName, POV_File_Text_INC, actualFileName, true);
+    IStream *is = Locate_File(formalFileName, POV_File_Text_INC, actualFileName, true, fromBuiltinFile);
     if (is == nullptr)
     {
         Input_File->In_File = nullptr;  /* Keeps from closing failed file. */
         Error ("Cannot open include file %s.", UCS2toASCIIString(formalFileName).c_str());
     }
     else
-        Input_File->In_File = new IBufferedTextStream(formalFileName.c_str(), is);
+        // a built-in file is known by its pseudo-path, so that messages say where it came from
+        Input_File->In_File = new IBufferedTextStream(IsBuiltinFilePath(actualFileName) ? actualFileName.c_str() : formalFileName.c_str(), is);
 
     Input_File->R_Flag=false;
 
@@ -4678,7 +4685,8 @@ void Parser::IncludeHeader(const UCS2String& formalFileName)
         Error ("Cannot open include header file %s.", UCS2toASCIIString(formalFileName).c_str());
     }
     else
-        Input_File->In_File = new IBufferedTextStream(formalFileName.c_str(), is);
+        // a built-in file is known by its pseudo-path, so that messages say where it came from
+        Input_File->In_File = new IBufferedTextStream(IsBuiltinFilePath(actualFileName) ? actualFileName.c_str() : formalFileName.c_str(), is);
 
     Input_File->R_Flag=false;
 

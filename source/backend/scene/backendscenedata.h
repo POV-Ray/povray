@@ -74,9 +74,18 @@ class BackendSceneData : public SceneData
          *  @param  ctx             POVMS message context for the current thread.
          *  @param  filename        Name and optional (partial) path.
          *  @param  stype           File type.
+         *  @param  flags           Any of @ref kFindFileProbe and @ref kFindFileFromBuiltinFile.
          *  @return                 Name of found file or empty string.
          */
-        UCS2String FindFile(POVMSContext ctx, const UCS2String& filename, unsigned int stype);
+        UCS2String FindFile(POVMSContext ctx, const UCS2String& filename, unsigned int stype, unsigned int flags = 0);
+
+        /// FindFile() flag: the caller only asks whether the file exists and reports
+        /// no error if it does not (`file_exists()`), so the front end prints no notes.
+        static const unsigned int kFindFileProbe = 1;
+        /// FindFile() flag: the name is `#include`d by a file read from the built-in
+        /// standard include files, so the front end takes a built-in copy in
+        /// preference to the library paths.
+        static const unsigned int kFindFileFromBuiltinFile = 2;
 
         /**
          *  Open a file for reading.

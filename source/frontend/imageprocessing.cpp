@@ -40,6 +40,7 @@
 #include <memory>
 
 // POV-Ray header files (base module)
+#include "base/builtinfiles.h"
 #include "base/image/dither.h"
 #include "base/image/image.h"
 
@@ -224,6 +225,17 @@ bool ImageProcessing::OutputIsStderr(POVMS_Object& ropts)
     return toStderr;
 }
 
+// The input file name an output file name is derived from. For a scene named by the pseudo-path
+// of a built-in file (e.g. `<builtin>/benchmark.pov`), that is the bare name, so that the output
+// goes to the current directory.
+static Path InputFileForOutput(POVMS_Object& ropts)
+{
+    UCS2String name(ropts.TryGetUCS2String(kPOVAttrib_InputFile, "object.pov"));
+    if (IsBuiltinFilePath(name))
+        return Path(name.substr(name.find('/') + 1));
+    return Path(name);
+}
+
 UCS2String ImageProcessing::GetOutputFilename(POVMS_Object& ropts, POVMSInt frame, int digits)
 {
     Path path(ropts.TryGetUCS2String(kPOVAttrib_OutputFile, ""));
@@ -304,11 +316,11 @@ UCS2String ImageProcessing::GetOutputFilename(POVMS_Object& ropts, POVMSInt fram
         // get the input file name and merge the existing path if need be.
         if (path.Empty() == true)
         {
-            path = ropts.TryGetUCS2String(kPOVAttrib_InputFile, "object.pov");
+            path = InputFileForOutput(ropts);
             filename = path.GetFile();
         }
         else
-            filename = Path(ropts.TryGetUCS2String(kPOVAttrib_InputFile, "object.pov")).GetFile();
+            filename = Path(InputFileForOutput(ropts)).GetFile();
 
         // if the input file name ends with '.' or '.anything', we remove it
         UCS2String::size_type pos = filename.find_last_of('.');
@@ -328,7 +340,7 @@ UCS2String ImageProcessing::GetOutputFilename(POVMS_Object& ropts, POVMSInt fram
     {
         // if there is no path component already, get it from the input file.
         if (path.Empty() == true)
-            path = ropts.TryGetUCS2String(kPOVAttrib_InputFile, "object.pov");
+            path = InputFileForOutput(ropts);
 
         // if the filename ends with a '.' or with the default extension (case-sensitive),
         // we remove it.

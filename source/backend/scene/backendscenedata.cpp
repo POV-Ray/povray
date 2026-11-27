@@ -45,6 +45,7 @@
 #endif
 
 // POV-Ray header files (base module)
+#include "base/builtinfiles.h"
 #include "base/fileutil.h"
 
 // POV-Ray header files (POVMS module)
@@ -60,7 +61,7 @@ BackendSceneData::BackendSceneData() :
     SceneData()
 {}
 
-UCS2String BackendSceneData::FindFile(POVMSContext ctx, const UCS2String& filename, unsigned int stype)
+UCS2String BackendSceneData::FindFile(POVMSContext ctx, const UCS2String& filename, unsigned int stype, unsigned int flags)
 {
     vector<UCS2String> filenames;
     UCS2String foundfile;
@@ -123,13 +124,19 @@ UCS2String BackendSceneData::FindFile(POVMSContext ctx, const UCS2String& filena
 #endif
 
     // otherwise, request to find the file
-    RenderBackend::SendFindFile(ctx, sceneId, frontendAddress, filenames, foundfile);
+    RenderBackend::SendFindFile(ctx, sceneId, frontendAddress, filenames, foundfile,
+                                (flags & kFindFileProbe) != 0, (flags & kFindFileFromBuiltinFile) != 0);
 
     return foundfile;
 }
 
 IStream *BackendSceneData::ReadFile(POVMSContext ctx, const UCS2String& origname, const UCS2String& filename, unsigned int stype)
 {
+    // the front end names a built-in file by its pseudo-path; it is part of the
+    // program, so the I/O restrictions do not apply
+    if (IsBuiltinFilePath(filename))
+        return OpenBuiltinFile(filename);
+
     UCS2String scenefile(filename);
     UCS2String localfile;
     UCS2String fileurl;

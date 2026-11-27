@@ -118,6 +118,7 @@ struct ProcessOptions::INI_Parser_Table RenderOptions_INI_Table[] =
     { "BSP_MissChance",      kPOVAttrib_BSP_MissChance,     kPOVMSType_Float },
     { "Buffer_Output",       0,                             0 },
     { "Buffer_Size",         0,                             0 },
+    { "Builtin_Includes",    kPOVAttrib_BuiltinIncludes,    kPOVMSType_Bool },
 
     { "Clock",               kPOVAttrib_Clock,              kPOVMSType_Float },
     { "Clockless_Animation", kPOVAttrib_ClocklessAnimation, kPOVMSType_Bool },

@@ -135,6 +135,7 @@ namespace vfe
       virtual FILE* OpenLocalFile (const UCS2String& name, const char *mode);
       virtual void DeleteLocalFile (const UCS2String& name);
       virtual bool AllowLocalFileAccess (const UCS2String& name, const unsigned int fileType, bool write);
+      virtual bool ListLocalDirectory (const UCS2String& dir, vector<UCS2String>& names);
 
     protected:
       vfeSession* m_Session;
