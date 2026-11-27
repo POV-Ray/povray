@@ -141,6 +141,12 @@
     <ClCompile Include="..\..\source\base\data\bluenoise64a.cpp">
       <Filter>Base source\Data</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\base\builtinfiles.cpp">
+      <Filter>Base source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\base\builtinfiles_data.cpp">
+      <Filter>Base source</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\source\base\image\dither.cpp">
       <Filter>Base source\Image</Filter>
     </ClCompile>
@@ -283,6 +289,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\base\data\bluenoise64a.h">
       <Filter>Base Headers\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\base\builtinfiles.h">
+      <Filter>Base Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\base\image\dither.h">
       <Filter>Base Headers\Image</Filter>

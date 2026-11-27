@@ -196,13 +196,13 @@ bool IFileStream::getline(char *s, size_t buflen)
 }
 
 IMemStream::IMemStream(const unsigned char* data, size_t size, const char* formalName, POV_OFF_T formalStart) :
-    IStream(SysToUCS2String(formalName)), size(size), pos(0), formalStart(formalStart), start(data), mUngetBuffer(EOF)
+    IStream(SysToUCS2String(formalName)), size(size), pos(0), formalStart(formalStart), start(data), mUngetBuffer(EOF), mEndReached(false)
 {
     fail = false;
 }
 
 IMemStream::IMemStream(const unsigned char* data, size_t size, const UCS2String& formalName, POV_OFF_T formalStart) :
-    IStream(formalName), size(size), pos(0), formalStart(formalStart), start(data), mUngetBuffer(EOF)
+    IStream(formalName), size(size), pos(0), formalStart(formalStart), start(data), mUngetBuffer(EOF), mEndReached(false)
 {
     fail = false;
 }
@@ -515,18 +515,71 @@ bool IMemStream::UnRead_Byte(int c)
     return true;
 }
 
+// Reads a line as IFileStream::getline() does: up to and excluding the line ending
+// (LF, CR, CR LF or LF CR), at most `buflen - 1` characters, and fails only when
+// called at the end of the data after the end has been reached.
 bool IMemStream::getline(char *s,size_t buflen)
 {
-    // Not needed for inbuilt fonts or scene file caching
-    POV_FILE_ASSERT(false);
-    return !fail;
+    if (fail)
+        return false;
+
+    if ((mUngetBuffer == EOF) && (pos >= size) && mEndReached)
+    {
+        fail = true;
+        return false;
+    }
+
+    if (buflen == 0)
+        return true;
+
+    while (buflen > 1)
+    {
+        int chr = Peek_Byte();
+        if (chr == EOF)
+            break;
+        Skip_Byte();
+        if ((chr == 10) || (chr == 13))
+        {
+            int other = (chr == 10) ? 13 : 10;
+            if (Peek_Byte() == other)
+                Skip_Byte();
+            break;
+        }
+        *s = char(chr);
+        s++;
+        buflen--;
+    }
+    *s = 0;
+
+    return true;
+}
+
+// Returns the next byte without consuming it, or EOF at the end of the data
+// (noting that the end has been reached, as reading past the end of a file does).
+int IMemStream::Peek_Byte()
+{
+    if (mUngetBuffer != EOF)
+        return mUngetBuffer;
+    if (pos < size)
+        return start[pos];
+    mEndReached = true;
+    return EOF;
+}
+
+void IMemStream::Skip_Byte()
+{
+    if (mUngetBuffer != EOF)
+        mUngetBuffer = EOF;
+    else if (pos < size)
+        pos++;
 }
 
 POV_OFF_T IMemStream::tellg() const
 {
+    // a byte in the unget buffer has been read from the position before `pos`
     size_t physicalPos = pos;
-    if (mUngetBuffer != EOF)
-        ++physicalPos;
+    if ((mUngetBuffer != EOF) && (physicalPos > 0))
+        --physicalPos;
     return formalStart + physicalPos;
 }
 
@@ -535,6 +588,7 @@ bool IMemStream::seekg(POV_OFF_T posi, unsigned int whence)
     // Any seek operation renders the end-of-file status and unget buffer's content obsolete.
     fail = false;
     mUngetBuffer = EOF;
+    mEndReached = false;
 
     switch(whence)
     {
