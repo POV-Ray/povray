@@ -44,6 +44,10 @@
 // C++ variants of standard C header files
 #include <cstddef>
 
+// Standard C++ header files
+#include <string>
+#include <vector>
+
 // POV-Ray header files (base module)
 #include "base/fileinputoutput.h"
 #include "base/stringutilities.h"
@@ -153,6 +157,36 @@ IMemStream* OpenBuiltinFile(const UCS2String& path);
 /// new render job starts.
 ///
 void ReleaseBuiltinFileCache();
+
+/// Outcome of @ref WriteBuiltinFiles().
+struct WriteBuiltinFilesResult
+{
+    bool                     ok;        ///< Whether every built-in file was written.
+    std::vector<std::string> written;   ///< Paths of the files written, in table order.
+    std::vector<std::string> existing;  ///< Paths that already existed (when refusing to overwrite).
+    size_t                   bytes;     ///< Total size of the files written.
+    std::string              message;   ///< What went wrong, if anything; empty on success.
+
+    WriteBuiltinFilesResult() : ok(false), bytes(0) {}
+};
+
+/// Write the built-in files out to a directory, for reading or modifying them.
+///
+/// Each file is written under its own name, byte for byte as it is in
+/// `distribution/include`. Unless @p overwrite is set, nothing at all is written
+/// if any of the files already exists in the directory (any entry of that name
+/// counts, even a directory or a link to nothing; on Windows whatever its case);
+/// the existing ones are then listed in the result. Each file is created
+/// exclusively, so one that appears meanwhile is not overwritten either, and if
+/// any file cannot be created or written, those this call created are removed
+/// again. The directory must exist; it is not created. The message names the
+/// file concerned and the system's reason.
+///
+/// @param  dir         The directory; empty for the current directory.
+/// @param  overwrite   Whether to replace files that exist.
+/// @return             What was written, or why not.
+///
+WriteBuiltinFilesResult WriteBuiltinFiles(const UCS2String& dir, bool overwrite = false);
 
 /// @}
 ///

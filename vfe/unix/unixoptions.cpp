@@ -70,6 +70,7 @@ namespace vfePlatform
         UnixOptionsProcessor::Option_Info("general", "version", "off", false, "--version|-version|--V", "", "display program version"),
         UnixOptionsProcessor::Option_Info("general", "generation", "off", false, "--generation", "", "display program generation (short version number)"),
         UnixOptionsProcessor::Option_Info("general", "benchmark", "off", false, "--benchmark|-benchmark", "", "run the standard POV-Ray benchmark"),
+        UnixOptionsProcessor::Option_Info("general", "write-includes", "", true, "--write-includes", "", "write the built-in standard include files to a directory (--write-includes=DIR)"),
         UnixOptionsProcessor::Option_Info("", "", "", false, "", "", "") // has to be last
     };
 
@@ -342,7 +343,15 @@ namespace vfePlatform
                 {
                     for (int i = 1; i < nargc;)
                     {
-                        if (string(nargv[i]) == (*iter_c))
+                        // an option taking a parameter may also be given as `--option=parameter`
+                        string arg(nargv[i]);
+                        if ((*iter).has_param && (arg.size() > iter_c->size()) &&
+                            (arg.compare(0, iter_c->size(), *iter_c) == 0) && (arg[iter_c->size()] == '='))
+                        {
+                            (*iter).Value = arg.substr(iter_c->size() + 1);
+                            remove_arg(&nargc, nargv, i);
+                        }
+                        else if (arg == (*iter_c))
                         {
                             if ((*iter).has_param)
                             {

@@ -190,6 +190,16 @@ New Features
     built-in standard include files are never used, not even by explicit
     `<builtin>/` names; a standard file that is not found on disk then gives
     the usual error, preceded by a note naming the option.
+  - The Unix and Windows console builds take a new option
+    `--write-includes=DIR` (or `--write-includes DIR`), which writes the
+    built-in standard include files to the existing directory `DIR`, exactly
+    as they are in the distribution, for reading or modifying them, lists what
+    it wrote, and does nothing else. If any of the files already exists there,
+    nothing is written, and if one cannot be created or written, those already
+    written are removed again; the message names the file and the reason. A
+    missing or empty `DIR` is an error (`.` is the current directory). Put on
+    a library path, such a directory is then used instead of the built-in
+    files.
 
 Performance Improvements
 ------------------------

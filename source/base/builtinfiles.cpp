@@ -39,6 +39,8 @@
 #include "base/builtinfiles.h"
 
 // C++ variants of standard C header files
+#include <cerrno>
+#include <cstdio>
 #include <cstring>
 
 // Standard C++ header files
@@ -52,7 +54,12 @@
 #include <zlib.h>
 
 // POV-Ray header files (base module)
+#include "base/filesystem.h"
+#include "base/fileutil.h"
+#include "base/path.h"
+#include "base/platformbase.h"
 #include "base/pov_err.h"
+#include "base/stringutilities.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -202,6 +209,150 @@ void ReleaseBuiltinFileCache()
 {
     std::lock_guard<std::mutex> lock(gBuiltinFileCacheMutex);
     gBuiltinFileCache.clear();
+}
+
+namespace
+{
+
+/// Whether a name listed in a directory is taken by a file to be written there. Windows
+/// finds names whatever their case, so `COLORS.INC` takes `colors.inc` there.
+bool SameFileName(const UCS2String& listed, const char* name)
+{
+    std::string bare;
+    if (!ToBareAsciiName(listed, 0, bare))
+        return false;
+#ifdef _WIN32
+    return (pov_stricmp(bare.c_str(), name) == 0);
+#else
+    return (bare == name);
+#endif
+}
+
+/// Remove the files written so far, after a failure.
+void RemoveWritten(WriteBuiltinFilesResult& result, const std::vector<Path>& paths)
+{
+    for (size_t i = 0; i < result.written.size(); ++i)
+        Filesystem::DeleteFile(paths[i]());
+    result.written.clear();
+    result.bytes = 0;
+}
+
+}
+// end of anonymous namespace
+
+WriteBuiltinFilesResult WriteBuiltinFiles(const UCS2String& dir, bool overwrite)
+{
+    WriteBuiltinFilesResult result;
+    std::vector<Path> paths;
+    size_t i = 0;
+
+    try
+    {
+        UCS2String folder(dir);
+        if ((folder.empty() == false) && (POV_IS_PATH_SEPARATOR(folder[folder.size() - 1]) == false))
+        {
+            // the name as given must be valid by itself: on Windows a bare `K:` is drive-relative,
+            // which is not supported, and would otherwise become the root `K:\`
+            (void)Path(folder);
+            folder += POV_PATH_SEPARATOR;
+        }
+        Path base(folder);
+        for (i = 0; i < kBuiltinFileCount; ++i)
+            paths.push_back(Path(base, Path(ASCIItoUCS2String(kBuiltinFiles[i].name))));
+
+        if (overwrite == false)
+        {
+            // Any entry of a file's name counts, even a directory or a link to nothing, as it
+            // would stop the file from being created. A directory that cannot be listed is
+            // probed for each name; the exclusive creation below catches anything missed.
+            std::vector<UCS2String> listing;
+            bool listed = PlatformBase::GetInstance().ListLocalDirectory(base(), listing);
+            for (i = 0; i < kBuiltinFileCount; ++i)
+            {
+                bool exists = false;
+                if (listed == true)
+                {
+                    for (std::vector<UCS2String>::const_iterator n(listing.begin()); (n != listing.end()) && (exists == false); ++n)
+                        exists = SameFileName(*n, kBuiltinFiles[i].name);
+                }
+                else
+                    exists = CheckIfFileExists(paths[i]);
+                if (exists == true)
+                    result.existing.push_back(UCS2toSysString(paths[i]()));
+            }
+            if (result.existing.empty() == false)
+            {
+                result.message = "Some of the files already exist; nothing was written.";
+                return result;
+            }
+        }
+
+        for (i = 0; i < kBuiltinFileCount; ++i)
+        {
+            std::string name(UCS2toSysString(paths[i]()));
+            BuiltinFileDataPtr data(GetData(kBuiltinFiles[i]));
+
+            // unless overwriting, create the file only if there is no entry of that name at all
+            // (C11 and C++17 `x` mode: not through an existing file, nor a link to a missing one)
+            errno = 0;
+            FILE* f = PlatformBase::GetInstance().OpenLocalFile(paths[i](), overwrite ? "wb" : "wbx");
+            if (f == nullptr)
+            {
+                int err = errno;
+                if ((err == EEXIST) && (overwrite == false))
+                    result.message = "'" + name + "' already exists";
+                else
+                    result.message = "Cannot create '" + name + "'" + ((err != 0) ? std::string(": ") + std::strerror(err) : std::string());
+                break;
+            }
+            result.written.push_back(name);
+            bool good = (data->empty() || (fwrite(data->data(), data->size(), 1, f) == 1));
+            int err = errno;
+            good = (fclose(f) == 0) && good;
+            if (good == false)
+            {
+                if (err == 0)
+                    err = errno;
+                result.message = "Cannot write '" + name + "'" + ((err != 0) ? std::string(": ") + std::strerror(err) : std::string());
+                break;
+            }
+            result.bytes += data->size();
+        }
+    }
+    catch (pov_base::Exception& e)
+    {
+        result.message = e.what();
+    }
+    catch (std::bad_alloc&)
+    {
+        result.message = "Out of memory.";
+    }
+    catch (std::exception& e)
+    {
+        result.message = e.what();
+    }
+
+    if (i < kBuiltinFileCount)
+    {
+        // the message is completed below, so it must not end in a full stop yet
+        if ((result.message.empty() == false) && (result.message[result.message.size() - 1] == '.'))
+            result.message.erase(result.message.size() - 1);
+
+        // nothing is left half done: a file this call created is removed again
+        if ((overwrite == false) && (result.written.empty() == false))
+        {
+            RemoveWritten(result, paths);
+            result.message += "; the files already written were removed again, so nothing was written.";
+        }
+        else if (result.written.empty() == true)
+            result.message += "; nothing was written.";
+        else
+            result.message += ".";
+        return result;
+    }
+
+    result.ok = true;
+    return result;
 }
 
 }
