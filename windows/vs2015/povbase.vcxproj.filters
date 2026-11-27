@@ -19,12 +19,6 @@
     <Filter Include="Base Headers\Animation">
       <UniqueIdentifier>{d5a32d03-c8d0-4ef2-af6b-b1c14e818dec}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Base Headers\Font">
-      <UniqueIdentifier>{9342c598-21d7-47b7-ae5a-013c3680a3bc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Base source\Font">
-      <UniqueIdentifier>{9f44d3c5-81d8-4017-a1b7-5a6f9a139e28}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Base Headers\Data">
       <UniqueIdentifier>{32531c25-b41d-42b5-88a0-77de8a8daa8d}</UniqueIdentifier>
     </Filter>
@@ -101,18 +95,6 @@
     </ClCompile>
     <ClCompile Include="..\..\source\base\animation\moov.cpp">
       <Filter>Base source\Animation</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\base\font\crystal.cpp">
-      <Filter>Base source\Font</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\base\font\cyrvetic.cpp">
-      <Filter>Base source\Font</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\base\font\povlogo.cpp">
-      <Filter>Base source\Font</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\base\font\timrom.cpp">
-      <Filter>Base source\Font</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\base\colour.cpp">
       <Filter>Base source</Filter>
@@ -238,18 +220,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\base\safemath.h">
       <Filter>Base Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\base\font\crystal.h">
-      <Filter>Base Headers\Font</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\base\font\cyrvetic.h">
-      <Filter>Base Headers\Font</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\base\font\povlogo.h">
-      <Filter>Base Headers\Font</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\base\font\timrom.h">
-      <Filter>Base Headers\Font</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\base\colour.h">
       <Filter>Base Headers</Filter>

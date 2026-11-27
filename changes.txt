@@ -328,6 +328,9 @@ Other Noteworthy
     option. In this case it defaults to `$USER <no contact address>`, where
     `$USER` is your login name.
   - The `boost_thread` and `boost_system` libraries are no longer required.
+  - The four fonts used by `text` objects given as `internal 0` to
+    `internal 3` are now read from the built-in standard include files, so the
+    program no longer holds a second, uncompressed copy of them.
 
 
 Changes between 3.7.1-beta.9 and 3.7.1-rc.1

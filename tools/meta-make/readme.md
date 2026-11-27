@@ -44,10 +44,6 @@ The following files will be re-created:
 |:--------------------------------------------------|:----------------------------------------------------------|
 | `source/base/data/bluenoise*.cpp`/`.h`            | `tools/meta-make/bluenoise/metagen-bluenoise.py`          |
 | `source/base/builtinfiles_data.cpp`               | all files in `distribution/include`, by `tools/meta-make/builtinfiles/metagen-builtinfiles.py` |
-| `source/base/font/crystal.cpp`/`.h`               | `distribution/include/crystal.ttf`                        |
-| `source/base/font/cyrvetic.cpp`/`.h`              | `distribution/include/cyrvetic.ttf`                       |
-| `source/base/font/povlogo.cpp`/`.h`               | `distribution/include/povlogo.ttf`                        |
-| `source/base/font/timrom.cpp`/`.h`                | `distribution/include/timrom.ttf`                         |
 | `source/backend/control/benchmark_pov.cpp`/`.h`   | `distribution/scenes/advanced/benchmark/benchmark.pov`    |
 | `source/backend/control/benchmark_ini.cpp`/`.h`   | `distribution/scenes/advanced/benchmark/benchmark.ini`    |
 
@@ -62,4 +58,7 @@ stops the generator, and the generator says on stderr how many files it built in
 Leaving out a `.inc` file also leaves its name out of the test that makes a render
 use the files on disk when a library path holds a standard include file.
 To leave a file of `distribution/include` out of the program, add its name to the
-`EXCLUDE` list in `metagen-builtinfiles.py` and re-create the file.
+`EXCLUDE` list in `metagen-builtinfiles.py` and re-create the file. The fonts used
+by `internal` text objects (`povlogo.ttf`, `timrom.ttf`, `cyrvetic.ttf` and
+`crystal.ttf`) are read from the same table, so leaving one of them out also
+removes that internal font.
