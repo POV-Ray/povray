@@ -94,6 +94,26 @@ Changed Behaviour
     scene file itself was found on a library path, that directory is still
     read relative to the current directory, and may then not be the one the
     scene is in. The search for the scene file itself is unchanged.
+  - Photon map files (`save_file` and `load_file` in the `photons` block of
+    `global_settings`) are now subject to the I/O restrictions on all
+    platforms, like the other files POV-Ray reads or writes (e.g. `#fopen`
+    files and output images); previously they bypassed them. Where writing is
+    restricted (the default both in POV-Ray for Windows and in the
+    `povray.conf` supplied for Unix), a photon map can now be saved only in the
+    directories that permit writing: in POV-Ray for Windows these include the
+    scene's own directory but not its subdirectories, and the default
+    `povray.conf` permits only `.` (again not its subdirectories) and `/tmp`.
+    Elsewhere the save is refused and the render fails with "IO Restrictions
+    prohibit write access to '<file>'". Where reading is restricted (as with
+    the Unix `povray.conf`), loading is likewise limited to the permitted
+    directories. A relative name is still taken relative to the current
+    directory, which in POV-Ray for Windows is the scene's directory only for a
+    scene it renders as its own source file. On Windows, a drive-relative name
+    such as `K:map.ph` is now refused like all other drive-relative paths. As
+    the restrictions are checked only when the file is opened, a refused save
+    fails the render only after the photons have been shot. The file format is
+    unchanged, but an empty file now fails to load, and a file holding surface
+    photons only (an older format) now loads.
 
 New Features
 ------------

@@ -37,11 +37,14 @@
 #include "backend/lighting/photonsortingtask.h"
 
 // C++ variants of C standard header files
-// C++ standard header files
 //  (none at the moment)
 
+// C++ standard header files
+#include <memory>
+
 // POV-Ray header files (base module)
-//  (none at the moment)
+#include "base/fileinputoutput.h"
+#include "base/path.h"
 
 // POV-Ray header files (core module)
 #include "core/bounding/boundingbox.h"
@@ -232,91 +235,58 @@ void PhotonSortingTask::sortPhotonMap()
   Postconditions:
     Returns true if success, false if failure.
     If success, the photon map has been written to the file.
+    If the I/O restrictions do not permit writing the file, an exception is thrown.
+
+  File format (unchanged; native byte order and structure layout):
+    int count of surface photons, followed by that many Photon structures;
+    [GLOBAL_PHOTONS builds only: int count of global photons and the photons;]
+    int count of media photons, followed by that many Photon structures.
 */
 bool PhotonSortingTask::save()
 {
-    Photon *ph;
-    FILE *f;
-    int i;
-    size_t err;
-    int numph;
-
-    f = fopen(GetSceneData()->photonSettings.fileName.c_str(), "wb");
-    if (!f)
+    // NewOStream asks the platform whether the file may be written, and throws if not.
+    std::unique_ptr<OStream> f(NewOStream(Path(GetSceneData()->photonSettings.fileName), POV_File_Data_Photons, false));
+    if (!f || !*f)
         return false;
 
     /* caustic photons */
-    numph = GetSceneData()->surfacePhotonMap.numPhotons;
-    fwrite(&numph, sizeof(numph),1,f);
-    if ((numph > 0) && !GetSceneData()->surfacePhotonMap.mBlockList.empty())
-    {
-        for(i=0; i<numph; i++)
-        {
-            ph = &GetSceneData()->surfacePhotonMap.GetPhoton(i);
-            err = fwrite(ph, sizeof(Photon), 1, f);
-
-            if (err<=0)
-            {
-                /* fwrite returned an error! */
-                fclose(f);
-                return false;
-            }
-        }
-    }
-    else
-    {
-        mpMessageFactory->PossibleError("Photon map for surface is empty.");
-    }
+    if (!saveMap(*f, GetSceneData()->surfacePhotonMap, "Photon map for surface is empty."))
+        return false;
 
 #ifdef GLOBAL_PHOTONS
     /* global photons */
-    numph = globalPhotonMap.numPhotons;
-    fwrite(&numph, sizeof(numph),1,f);
-    if ((numph > 0) && !globalPhotonMap.mBlockList.empty())
-    {
-        for(i=0; i<numph; i++)
-        {
-            ph = &globalPhotonMap.GetPhoton(i);
-            err = fwrite(ph, sizeof(Photon), 1, f);
-
-            if (err<=0)
-            {
-                /* fwrite returned an error! */
-                fclose(f);
-                return false;
-            }
-        }
-    }
-    else
-    {
-        mpMessageFactory->PossibleError("Global photon map is empty.");
-    }
+    if (!saveMap(*f, globalPhotonMap, "Global photon map is empty."))
+        return false;
 #endif
 
     /* media photons */
-    numph = GetSceneData()->mediaPhotonMap.numPhotons;
-    fwrite(&numph, sizeof(numph),1,f);
-    if ((numph > 0) && !GetSceneData()->mediaPhotonMap.mBlockList.empty())
-    {
-        for(i=0; i<numph; i++)
-        {
-            ph = &GetSceneData()->mediaPhotonMap.GetPhoton(i);
-            err = fwrite(ph, sizeof(Photon), 1, f);
+    if (!saveMap(*f, GetSceneData()->mediaPhotonMap, "Photon map for media is empty."))
+        return false;
 
-            if (err<=0)
-            {
-                /* fwrite returned an error! */
-                fclose(f);
+    f->flush();
+    return !!*f;
+}
+
+bool PhotonSortingTask::saveMap(OStream& f, PhotonMap& map, const char *emptyMessage)
+{
+    int numph = map.numPhotons;
+
+    if (!f.write(&numph, sizeof(numph)))
+        return false;
+
+    if ((numph > 0) && !map.mBlockList.empty())
+    {
+        for(int i = 0; i < numph; i++)
+        {
+            if (!f.write(&map.GetPhoton(i), sizeof(Photon)))
                 return false;
-            }
         }
     }
     else
     {
-        mpMessageFactory->PossibleError("Photon map for media is empty.");
+        mpMessageFactory->PossibleError("%s", emptyMessage);
     }
 
-    fclose(f);
     return true;
 }
 
@@ -333,76 +303,55 @@ bool PhotonSortingTask::save()
     Returns true if success, false if failure.
     If success, the photon map has been loaded from the file.
     If failure then the render should stop with an error
+    If the I/O restrictions do not permit reading the file, an exception is thrown.
 */
 bool PhotonSortingTask::load()
 {
-    int i;
-    size_t err;
-    Photon *ph;
-    FILE *f;
-    int numph;
-
     if (!GetSceneData()->photonSettings.photonsEnabled) return false;
 
     mpMessageFactory->Warning(kWarningGeneral,"Starting the load of photon file %s\n",GetSceneData()->photonSettings.fileName.c_str());
 
-    f = fopen(GetSceneData()->photonSettings.fileName.c_str(), "rb");
-    if (!f)
+    // NewIStream asks the platform whether the file may be read, and throws if not.
+    std::unique_ptr<IStream> f(NewIStream(Path(GetSceneData()->photonSettings.fileName), POV_File_Data_Photons));
+    if (!f || !*f)
         return false;
 
-    fread(&numph, sizeof(numph),1,f);
+    int numph;
 
-    for(i=0; i<numph; i++)
-    {
-        ph = GetSceneData()->surfacePhotonMap.AllocatePhoton();
-        err = fread(ph, sizeof(Photon), 1, f);
+    /* caustic photons */
+    if (!f->read(&numph, sizeof(numph)))
+        return false;
+    if (!loadMap(*f, GetSceneData()->surfacePhotonMap, numph))
+        return false;
 
-        if (err<=0)
-        {
-            /* fread returned an error! */
-            fclose(f);
-            return false;
-        }
-    }
-
-    if (!feof(f)) /* for backwards file format compatibility */
-    {
+    // A file that ends here holds surface photons only (backwards file format compatibility).
+    // Tell a clean end of file from a read error or a count cut short, which are failures.
+    int c = f->Read_Byte();
+    if (c == EOF)
+        return f->eof();
+    if (!f->UnRead_Byte(c) || !f->read(&numph, sizeof(numph)))
+        return false;
 
 #ifdef GLOBAL_PHOTONS
-        /* global photons */
-        fread(&numph, sizeof(numph),1,f);
-        for(i=0; i<numph; i++)
-        {
-            ph = GetSceneData()->globalPhotonMap.AllocatePhoton();
-            err = fread(ph, sizeof(Photon), 1, f);
-
-            if (err<=0)
-            {
-                /* fread returned an error! */
-                fclose(f);
-                return false;
-            }
-        }
+    /* global photons */
+    if (!loadMap(*f, GetSceneData()->globalPhotonMap, numph))
+        return false;
+    if (!f->read(&numph, sizeof(numph)))
+        return false;
 #endif
 
-        /* media photons */
-        fread(&numph, sizeof(numph),1,f);
-        for(i=0; i<numph; i++)
-        {
-            ph = GetSceneData()->mediaPhotonMap.AllocatePhoton();
-            err = fread(ph, sizeof(Photon), 1, f);
+    /* media photons */
+    return loadMap(*f, GetSceneData()->mediaPhotonMap, numph);
+}
 
-            if (err<=0)
-            {
-                /* fread returned an error! */
-                fclose(f);
-                return false;
-            }
-        }
-
+bool PhotonSortingTask::loadMap(IStream& f, PhotonMap& map, int numph)
+{
+    for(int i = 0; i < numph; i++)
+    {
+        if (!f.read(map.AllocatePhoton(), sizeof(Photon)))
+            return false;
     }
 
-    fclose(f);
     return true;
 }
 
