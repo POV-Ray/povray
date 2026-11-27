@@ -39,6 +39,8 @@
 
 #include "vfe.h"
 
+#include "base/builtinfiles.h"
+
 /***************************************************************************************/
 /* TODO FIXME: we should call into the POVMS code to do this lookup, but as Thorsten's */
 /* away right now I can't ask him how he would prefer it be implemented. So the below  */
@@ -255,7 +257,8 @@ int vfeSession::SetOptionsInternal (vfeRenderOptions& opts)
   {
     // we call TestAccessAllowed() here, even though ParseFile() will do it also, since if
     // access is denied, the reason will not be obvious (ParseFile() just returns kCannotOpenFileErr).
-    if (!TestAccessAllowed (Path(*i), false))
+    // an INI file held in memory, such as `<builtin>/benchmark.ini`, is not subject to the restrictions.
+    if (!IsBuiltinFilePath (*i) && !TestAccessAllowed (Path(*i), false))
       return (m_LastError = vfeIORestrictionDeny);
 
     if ((err = options.ParseFile (UCS2toASCIIString(*i).c_str(), &obj)) != kNoErr)

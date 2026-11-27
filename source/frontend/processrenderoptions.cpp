@@ -45,6 +45,7 @@
 #include <string>
 
 // POV-Ray header files (base module)
+#include "base/builtinfiles.h"
 #include "base/fileutil.h"
 #include "base/platformbase.h"
 #include "base/image/colourspace.h"
@@ -1024,6 +1025,17 @@ ITextStream *ProcessRenderOptions::OpenINIFileStream(const char *filename, unsig
     POVMSAttribute attr, item;
     const char *xstr = strrchr(filename, '.');
     bool hasextension = ((xstr != nullptr) && (strlen(xstr) <= 4)); // TODO FIXME - we shouldn't rely on extensions being at most 1+3 chars long
+
+    // The one INI file held in memory, `<builtin>/benchmark.ini`, is part of the program (the
+    // I/O restrictions do not apply) and is only ever found by its exact pseudo-path; no other
+    // name beginning with `<builtin>/` is an INI file.
+    UCS2String uname(ASCIItoUCS2String(filename));
+    if (IsBuiltinFilePath(uname))
+    {
+        if ((uname != ASCIItoUCS2String(kBuiltinFilePrefix) + ASCIItoUCS2String("benchmark.ini")) || (IsBuiltinTextPath(uname) == false))
+            return nullptr;
+        return new IBufferedTextStream(uname.c_str(), OpenBuiltinFile(uname));
+    }
 
     // TODO - the following statement may need reviewing; before it was changed from a macro to a PlatformBase call,
     //        it carried a comment "TODO FIXME - Remove dependency on this macro!!! [trf]".
