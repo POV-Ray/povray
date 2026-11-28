@@ -44,6 +44,8 @@
 //  (none at the moment)
 
 // POV-Ray header files (base module)
+#include "base/builtinfiles.h"
+
 // POV-Ray header files (core module)
 // POV-Ray header files (POVMS module)
 //  (none at the moment)
@@ -79,6 +81,12 @@ bool Write_Benchmark_File (const char *Scene_File_Name, const char *INI_File_Nam
     }
     fclose (outF) ;
     return (true) ;
+}
+
+void Register_Benchmark_Files (void)
+{
+    pov_base::RegisterBuiltinText ("benchmark.pov", Benchmark_File) ;
+    pov_base::RegisterBuiltinText ("benchmark.ini", Benchmark_Options) ;
 }
 
 unsigned int Get_Benchmark_Version (void)

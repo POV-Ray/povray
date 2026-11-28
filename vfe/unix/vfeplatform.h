@@ -100,6 +100,7 @@ namespace vfePlatform
             virtual void NotifyCriticalError(const char *message, const char *file, int line) override;
             virtual int RequestNewOutputPath(int CallCount, const std::string& Reason, const UCS2String& OldPath, UCS2String& NewPath) override;
             virtual bool TestAccessAllowed(const Path& file, bool isWrite) const override;
+            virtual bool ListDirectory(const UCS2String& dir, std::vector<UCS2String>& names) const override;
             virtual ShelloutProcessing *CreateShelloutProcessing(POVMS_Object& opts, const std::string& scene, unsigned int width, unsigned int height) override
                 { return new UnixShelloutProcessing(opts, scene, width, height); }
 

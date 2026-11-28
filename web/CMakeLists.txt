@@ -180,9 +180,9 @@ set(POVWEB_LINK_FLAGS
     -sFORCE_FILESYSTEM=1
     -sEXPORTED_RUNTIME_METHODS=callMain,FS,wasmMemory,UTF8ToString
     -sEXPORTED_FUNCTIONS=_main,_povweb_submit,_povweb_cancel,_povweb_set_clear_between_frames,_povweb_version,_povweb_framebuffer,_povweb_width,_povweb_height,_povweb_frame_serial,_povweb_current_frame,_povweb_total_frames
-    # Standard include files and INI files, packaged as `povray.data`.
+    # INI files, packaged as `povray.data`. The standard include files are not
+    # packaged: they are built into the program (see `source/base/builtinfiles.h`).
     # (`SHELL:` keeps CMake from de-duplicating the repeated flag.)
-    "SHELL:--preload-file ${POV_ROOT}/distribution/include@/povray/include"
     "SHELL:--preload-file ${POV_ROOT}/distribution/ini@/povray/ini"
     "SHELL:--preload-file ${WEB_ROOT}/etc@/povray/etc"
     $<$<CONFIG:Release>:-O3>
@@ -191,7 +191,6 @@ target_link_options(povray PRIVATE ${POVWEB_LINK_FLAGS})
 
 # Re-link when packaged data changes.
 file(GLOB_RECURSE POVWEB_PACKAGED_FILES CONFIGURE_DEPENDS
-    "${POV_ROOT}/distribution/include/*"
     "${POV_ROOT}/distribution/ini/*"
     "${WEB_ROOT}/etc/*"
 )

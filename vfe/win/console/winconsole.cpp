@@ -35,6 +35,9 @@
 ///
 //******************************************************************************
 
+#include <cstring>
+
+#include "base/builtinfiles.h"
 #include "base/version_info.h"
 
 #include "backend/povray.h"
@@ -87,6 +90,33 @@ void ErrorExit(vfeSession *session)
   exit (1);
 }
 
+// --write-includes=DIR: write the built-in standard include files to DIR
+static int WriteIncludes(const char *dir)
+{
+  if ((dir == nullptr) || (*dir == '\0'))
+  {
+    fprintf (stderr, "--write-includes needs a directory, as in --write-includes=DIR (. for the current directory)\n");
+    return 1;
+  }
+
+  pov_base::WriteBuiltinFilesResult result = pov_base::WriteBuiltinFiles(SysToUCS2String(dir));
+
+  for (std::vector<std::string>::const_iterator i = result.written.begin(); i != result.written.end(); i++)
+    fprintf (stderr, "wrote %s\n", i->c_str());
+  for (std::vector<std::string>::const_iterator i = result.existing.begin(); i != result.existing.end(); i++)
+    fprintf (stderr, "%s already exists\n", i->c_str());
+
+  if (result.ok)
+  {
+    fprintf (stderr, "wrote the %u built-in standard include files (%lu bytes) to %s\n",
+             (unsigned int) result.written.size(), (unsigned long) result.bytes, dir);
+    return 0;
+  }
+
+  fprintf (stderr, "%s\n", result.message.c_str());
+  return 1;
+}
+
 // this is an example of a minimal console version of POV-Ray using the VFE
 // (virtual front-end) library. it is NOT INTENDED TO BE A FULLY-FEATURED
 // CONSOLE IMPLEMENTATION OF POV-RAY and is not officially supported. see
@@ -110,6 +140,21 @@ int main (int argc, char **argv)
 
   if (session->Initialize(nullptr, nullptr) != vfeNoError)
     ErrorExit(session);
+
+  // the console's only long option, `--write-includes=DIR` or `--write-includes DIR`;
+  // it does nothing else
+  static const char writeIncludes[] = "--write-includes";
+  for (char **arg = argv + 1; *arg != nullptr; arg++)
+  {
+    const size_t length = sizeof (writeIncludes) - 1;
+    if ((strncmp (*arg, writeIncludes, length) == 0) && (((*arg)[length] == '=') || ((*arg)[length] == '\0')))
+    {
+      int result = WriteIncludes ((*arg)[length] == '=' ? *arg + length + 1 : arg[1]);
+      session->Shutdown() ;
+      delete session;
+      return result;
+    }
+  }
 
   if ((s = std::getenv ("POVINC")) != nullptr)
     opts.AddLibraryPath (s);

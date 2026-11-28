@@ -54,6 +54,7 @@
 #include <boost/algorithm/string.hpp>
 
 // other library header files
+#include <dirent.h>
 #include <pthread.h>
 #ifdef HAVE_SYS_TIME_H
 # include <sys/time.h>
@@ -169,6 +170,25 @@ namespace vfePlatform
     void vfeUnixSession::DeleteTemporaryFile(const UCS2String& filename) const
     {
         pov_base::Filesystem::DeleteFile(filename);
+    }
+
+    /////////////////////////////////////////////////////////////////////////
+    // names are converted as for opening files (see vfeFOpen() in vfe.cpp)
+    bool vfeUnixSession::ListDirectory(const UCS2String& dir, std::vector<UCS2String>& names) const
+    {
+        names.clear();
+        DIR *d = opendir(dir.empty() ? "." : UCS2toSysString(dir).c_str());
+        // a directory that is not there is empty; one that cannot be listed (e.g. mode 0111)
+        // may still have files that can be opened by name, so the caller looks for them
+        if (d == nullptr)
+            return ((errno == ENOENT) || (errno == ENOTDIR));
+        while (struct dirent *e = readdir(d))
+        {
+            if ((strcmp(e->d_name, ".") != 0) && (strcmp(e->d_name, "..") != 0))
+                names.push_back(SysToUCS2String(e->d_name));
+        }
+        closedir(d);
+        return true;
     }
 
     //////////////////////////////////////////////////////////////

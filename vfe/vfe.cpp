@@ -280,6 +280,11 @@ bool vfePlatformBase::AllowLocalFileAccess (const UCS2String& name, const unsign
         return Allow_File_Read (name.c_str(), fileType);
 }
 
+bool vfePlatformBase::ListLocalDirectory (const UCS2String& dir, std::vector<UCS2String>& names)
+{
+  return (m_Session != nullptr) && m_Session->ListDirectory (dir, names);
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////
 //
 // class vfeParserMessageHandler
@@ -633,6 +638,7 @@ bool VirtualFrontEnd::Start(POVMS_Object& opts)
   animationProcessing.reset() ;
   m_PauseRequested = m_PausedAfterFrame = false;
   m_PostPauseState = kReady;
+  renderFrontend.StartJob();
 
   Path ip (m_Session->GetInputFilename());
   shelloutProcessing.reset(m_Session->CreateShelloutProcessing(opts, UCS2toSysString(ip.GetFile()), m_Session->GetRenderWidth(), m_Session->GetRenderHeight())) ;

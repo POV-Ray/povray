@@ -238,8 +238,16 @@ enum class CharacterEncodingID
 
 struct FileResolver
 {
+    /// FindFile() flag: the caller only asks whether the file exists and reports
+    /// no error if it does not (`file_exists()`), so the front end prints no notes.
+    static constexpr unsigned int kFindFileProbe = 1;
+    /// FindFile() flag: the name is `#include`d by a file read from the built-in
+    /// standard include files, so the front end takes a built-in copy in
+    /// preference to the library paths.
+    static constexpr unsigned int kFindFileFromBuiltinFile = 2;
+
     virtual ~FileResolver() = default;
-    virtual pov_base::UCS2String FindFile(pov_base::UCS2String parsedFileName, unsigned int fileType) = 0;
+    virtual pov_base::UCS2String FindFile(pov_base::UCS2String parsedFileName, unsigned int fileType, unsigned int flags = 0) = 0;
     virtual pov_base::IStream* ReadFile(const pov_base::UCS2String& parsedFileName,
                                         const pov_base::UCS2String& foundFileName, unsigned int fileType) = 0;
     virtual pov_base::OStream* CreateFile(const pov_base::UCS2String& parsedFileName,

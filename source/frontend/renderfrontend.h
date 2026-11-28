@@ -93,6 +93,49 @@ enum
     MAX_STREAMS
 };
 
+/// How the built-in copies of the standard include files are used in one render job.
+///
+/// A render job (one call of `vfe::VirtualFrontEnd::Start()`) may set up several
+/// scenes, one per frame of an animation; they all share one instance, so that the
+/// mode is decided once, from the first scene's options, and each note is printed
+/// once. See `base/builtinfiles.h` for the files themselves.
+///
+/// There is no locking: a front end replaces the instance (@ref RenderFrontendBase::StartJob())
+/// only while no job is running, and all the file requests of a job are handled on one
+/// thread (for vfe, its worker thread). A front end that never calls `StartJob()` keeps
+/// the first job's decision for its lifetime.
+///
+struct BuiltinIncludesJob final
+{
+    enum Mode
+    {
+        kUndecided,
+        kBuiltin,   ///< Built-in files are used for names not found on disk.
+        kDisk,      ///< A library path holds a standard include file, so only files on disk are used.
+        kOff        ///< Switched off by the `Builtin_Includes` option.
+    };
+
+    Mode mode;
+    UCS2String includeDir;          ///< In disk mode, the first library path found holding a standard include file.
+    std::set<std::string> notes;    ///< Notes already printed, so that each is printed once per job.
+
+    BuiltinIncludesJob() : mode(kUndecided) {}
+
+    /// Decide the mode, unless it has already been decided for this job.
+    ///
+    /// Each library path is listed once (or, where the platform cannot list
+    /// directories or a directory cannot be listed, probed for each standard
+    /// include file name).
+    ///
+    /// @param  enabled     Value of the `Builtin_Includes` option.
+    /// @param  searchpaths The library paths.
+    ///
+    void Decide(bool enabled, const std::list<Path>& searchpaths);
+
+    /// Print a note to the console, unless a note with the same key has already been printed in this job.
+    void Note(const std::shared_ptr<Console>& console, const std::string& key, const std::string& text);
+};
+
 struct SceneData final
 {
     enum SceneState
@@ -121,6 +164,8 @@ struct SceneData final
     Path outputpath;
 
     std::list<Path> searchpaths;
+
+    std::shared_ptr<BuiltinIncludesJob> builtinIncludes; ///< Shared by all scenes of a render job.
 
     std::shared_ptr<TextStreamBuffer> streams[MAX_STREAMS];
 
@@ -232,6 +277,12 @@ class RenderFrontendBase : public POVMS_MessageReceiver
         void ConnectToBackend(POVMSAddress, POVMS_Object&, POVMS_Object *, std::shared_ptr<Console>&);
         void DisconnectFromBackend(POVMSAddress);
 
+        /// Start a new render job: the scenes created from now on decide afresh
+        /// whether to use the built-in standard include files, and print their
+        /// notes afresh. Call this before creating a job's first scene; scenes
+        /// created without it belong to the previous job.
+        void StartJob();
+
         virtual std::shared_ptr<Console> GetConsole(SceneId) = 0;
         virtual std::shared_ptr<Image> GetImage(ViewId) = 0;
         virtual std::shared_ptr<Display> GetDisplay(ViewId) = 0;
@@ -241,6 +292,7 @@ class RenderFrontendBase : public POVMS_MessageReceiver
 
         BackendAddressSet backendaddresses;
         POVMSContext context;
+        std::shared_ptr<BuiltinIncludesJob> builtinIncludes;
 
         SceneId CreateScene(SceneData&, POVMSAddress, POVMS_Object&);
         void CloseScene(SceneData&, SceneId);

@@ -36,6 +36,7 @@
 // C++ variants of C standard header files
 #include <csignal>
 #include <cstdlib>
+#include <cstring>
 
 // C++ standard header files
 #include <memory>
@@ -62,6 +63,7 @@
 // from directory "source"
 #include "backend/povray.h"
 #include "backend/control/benchmark.h"
+#include "base/builtinfiles.h"
 
 namespace pov_frontend
 {
@@ -332,6 +334,32 @@ static void PauseWhenDone(vfeSession *session)
     GetRenderWindow()->PauseWhenDoneNotifyEnd();
 }
 
+static ReturnValue WriteIncludes(const std::string& dir)
+{
+    if (dir.empty())
+    {
+        fprintf(stderr, "%s: --write-includes needs a directory, as in --write-includes=DIR (. for the current directory)\n", PACKAGE);
+        return RETURN_ERROR;
+    }
+
+    pov_base::WriteBuiltinFilesResult result = pov_base::WriteBuiltinFiles(SysToUCS2String(dir.c_str()));
+
+    for (std::vector<std::string>::const_iterator i = result.written.begin(); i != result.written.end(); i++)
+        fprintf(stderr, "%s: wrote %s\n", PACKAGE, i->c_str());
+    for (std::vector<std::string>::const_iterator i = result.existing.begin(); i != result.existing.end(); i++)
+        fprintf(stderr, "%s: %s already exists\n", PACKAGE, i->c_str());
+
+    if (result.ok)
+    {
+        fprintf(stderr, "%s: wrote the %u built-in standard include files (%lu bytes) to %s\n",
+                PACKAGE, (unsigned int)result.written.size(), (unsigned long)result.bytes, dir.c_str());
+        return RETURN_OK;
+    }
+
+    fprintf(stderr, "%s: %s\n", PACKAGE, result.message.c_str());
+    return RETURN_ERROR;
+}
+
 static ReturnValue PrepareBenchmark(vfeSession *session, vfeRenderOptions& opts, std::string& ini, std::string& pov, int argc, char **argv)
 {
     // parse command-line options
@@ -361,8 +389,8 @@ static ReturnValue PrepareBenchmark(vfeSession *session, vfeRenderOptions& opts,
     fprintf(stderr, "\
 %s %s\n\n\
 Entering the standard POV-Ray %s benchmark version %x.%02x.\n\n\
-This built-in benchmark requires POV-Ray to be installed on your system\n\
-before running it.  There will be neither display nor file output, and\n\
+This built-in benchmark renders a scene held in the program, and needs no\n\
+installed files.  There will be neither display nor file output, and\n\
 any additional command-line option except setting the number of render\n\
 threads (+wtN for N threads) and library paths (+Lpath) will be ignored.\n\
 To get an accurate benchmark result you might consider running POV-Ray\n\
@@ -401,30 +429,12 @@ Press <Enter> to continue or <Ctrl-C> to abort.\n\
         Delay(20);
     }
 
-    std::string basename = UCS2toSysString(session->CreateTemporaryFile());
-    ini = basename + ".ini";
-    pov = basename + ".pov";
-    if (pov::Write_Benchmark_File(pov.c_str(), ini.c_str()))
-    {
-        fprintf(stderr, "%s: creating %s\n", PACKAGE, ini.c_str());
-        fprintf(stderr, "%s: creating %s\n", PACKAGE, pov.c_str());
-        fprintf(stderr, "Running standard POV-Ray benchmark version %x.%02x\n", benchversion / 256, benchversion % 256);
-    }
-    else
-    {
-        fprintf(stderr, "%s: failed to write temporary files for benchmark\n", PACKAGE);
-        return RETURN_ERROR;
-    }
+    // the scene and INI file are read from memory (see pov::Register_Benchmark_Files())
+    ini = "<builtin>/benchmark.ini";
+    pov = "<builtin>/benchmark.pov";
+    fprintf(stderr, "Running standard POV-Ray benchmark version %x.%02x\n", benchversion / 256, benchversion % 256);
 
     return RETURN_OK;
-}
-
-static void CleanupBenchmark(vfeUnixSession *session, std::string& ini, std::string& pov)
-{
-    fprintf(stderr, "%s: removing %s\n", PACKAGE, ini.c_str());
-    session->DeleteTemporaryFile(SysToUCS2String(ini.c_str()));
-    fprintf(stderr, "%s: removing %s\n", PACKAGE, pov.c_str());
-    session->DeleteTemporaryFile(SysToUCS2String(pov.c_str()));
 }
 
 static void TerminateSignalHandler(std::thread* sigthread)
@@ -514,6 +524,11 @@ int main (int argc, char **argv)
         nthreads = 4;
     opts.SetThreadCount(nthreads);
 
+    // `--write-includes` with an empty or missing directory is an error, not an option left unset
+    bool writeIncludesGiven = false;
+    for (int i = 1; (i < argc) && !writeIncludesGiven; i++)
+        writeIncludesGiven = (strcmp(argv[i], "--write-includes") == 0) || (strncmp(argv[i], "--write-includes=", 17) == 0);
+
     // process command-line options
     session->GetUnixOptions()->ProcessOptions(&argc, &argv);
     if (session->GetUnixOptions()->isOptionSet("general", "help"))
@@ -544,6 +559,15 @@ int main (int argc, char **argv)
         delete sigthread;
         delete session;
         return RETURN_OK;
+    }
+    else if (writeIncludesGiven)
+    {
+        retval = WriteIncludes(session->GetUnixOptions()->QueryOptionString("general", "write-includes"));
+        session->Shutdown();
+        TerminateSignalHandler(sigthread);
+        delete sigthread;
+        delete session;
+        return retval;
     }
     else if (session->GetUnixOptions()->isOptionSet("general", "benchmark"))
     {
@@ -646,9 +670,6 @@ int main (int argc, char **argv)
         PauseWhenDone(session);
         gCancelRender = false;
     }
-
-    if (running_benchmark)
-        CleanupBenchmark(session, bench_ini_name, bench_pov_name);
 
     if (session->Succeeded() == false)
         retval = gCancelRender ? RETURN_USER_ABORT : RETURN_ERROR;

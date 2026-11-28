@@ -41,11 +41,16 @@
 
 // C++ standard header files
 #include <algorithm>
+#include <string>
+#include <vector>
 
 // POV-Ray header files (base module)
+#include "base/builtinfiles.h"
 #include "base/fileinputoutput.h"
+#include "base/fileutil.h"
 #include "base/mathutil.h"
 #include "base/platformbase.h"
+#include "base/stringutilities.h"
 #include "base/textstream.h"
 #include "base/textstreambuffer.h"
 #include "base/types.h"
@@ -123,9 +128,82 @@ class FileTextStreamBuffer final : public TextStreamBuffer
         OTextStream stream;
 };
 
+// Whether file names are found whatever their case, as on Windows. If so, a library path
+// holding `COLORS.INC` counts as holding `colors.inc` when the mode is decided, as the file
+// will be found under that name; a requested name is still matched exactly against the
+// built-in files themselves. Other systems compare exactly here, as their lookup does.
+#ifdef _WIN32
+static const bool kFileNamesIgnoreCase = true;
+#else
+static const bool kFileNamesIgnoreCase = false;
+#endif
+
+/// Whether a name listed in a library path is that of a standard include file.
+static bool IsStandardIncludeName(const UCS2String& listed)
+{
+    if (kFileNamesIgnoreCase == false)
+    {
+        const BuiltinFileEntry* entry = FindBuiltinFile(listed);
+        return (entry != nullptr) && IsBuiltinIncludeFile(*entry);
+    }
+
+    std::string name(UCS2toSysString(listed));
+    for (size_t n = 0; n < kBuiltinFileCount; ++n)
+        if (IsBuiltinIncludeFile(kBuiltinFiles[n]) && (pov_stricmp(name.c_str(), kBuiltinFiles[n].name) == 0))
+            return true;
+    return false;
+}
+
+void BuiltinIncludesJob::Decide(bool enabled, const std::list<Path>& searchpaths)
+{
+    if (mode != kUndecided)
+        return;
+
+    if (enabled == false)
+    {
+        mode = kOff;
+        return;
+    }
+
+    // Only the names of the standard include files count (not the maps, images or fonts):
+    // exactly, or ignoring ASCII case on Windows (see kFileNamesIgnoreCase). A directory that
+    // cannot be listed is probed for each name instead, as its files may still be found.
+    std::vector<UCS2String> names;
+    for (std::list<Path>::const_iterator i(searchpaths.begin()); i != searchpaths.end(); ++i)
+    {
+        bool found = false;
+        if (PlatformBase::GetInstance().ListLocalDirectory((*i)(), names) == true)
+        {
+            for (std::vector<UCS2String>::const_iterator n(names.begin()); (n != names.end()) && (found == false); ++n)
+                found = IsStandardIncludeName(*n);
+        }
+        else
+        {
+            for (size_t n = 0; (n < kBuiltinFileCount) && (found == false); ++n)
+                found = IsBuiltinIncludeFile(kBuiltinFiles[n]) &&
+                        CheckIfFileExists(Path(*i, Path(ASCIItoUCS2String(kBuiltinFiles[n].name))));
+        }
+        if (found == true)
+        {
+            mode = kDisk;
+            includeDir = (*i)();
+            return;
+        }
+    }
+
+    mode = kBuiltin;
+}
+
+void BuiltinIncludesJob::Note(const std::shared_ptr<Console>& console, const std::string& key, const std::string& text)
+{
+    if ((console != nullptr) && (notes.insert(key).second == true))
+        console->Output(text + "\n");
+}
+
 RenderFrontendBase::RenderFrontendBase(POVMSContext ctx) :
     POVMS_MessageReceiver(ctx),
-    context(ctx)
+    context(ctx),
+    builtinIncludes(new BuiltinIncludesJob())
 {
     InstallFront(kPOVMsgClass_BackendControl, kPOVMsgIdent_Failed, this, &RenderFrontendBase::HandleMessage);
 
@@ -161,6 +239,12 @@ RenderFrontendBase::RenderFrontendBase(POVMSContext ctx) :
 RenderFrontendBase::~RenderFrontendBase()
 {
     // nothing to do
+}
+
+void RenderFrontendBase::StartJob()
+{
+    builtinIncludes.reset(new BuiltinIncludesJob());
+    ReleaseBuiltinFileCache();
 }
 
 void RenderFrontendBase::ConnectToBackend(POVMSAddress backendaddress, POVMS_Object& obj, POVMS_Object *resultobj, std::shared_ptr<Console>& console)
@@ -215,8 +299,12 @@ RenderFrontendBase::SceneId RenderFrontendBase::CreateScene(SceneData& shd, POVM
     if(result.GetIdentifier() == kPOVMsgIdent_Done)
     {
         shd.inputfile = obj.TryGetUCS2String(kPOVAttrib_InputFile, "");
-        shd.scenepath = Path(shd.inputfile);
-        shd.scenepath.SetFile("");
+        // a scene named by a pseudo-path (e.g. `<builtin>/benchmark.pov`) has no directory to search
+        if (IsBuiltinFilePath(shd.inputfile) == false)
+        {
+            shd.scenepath = Path(shd.inputfile);
+            shd.scenepath.SetFile("");
+        }
 
         shd.outputpath = Path(obj.TryGetUCS2String(kPOVAttrib_OutputPath, ""));
         // TODO FIXME BEGIN - this should not be needed, determine reason and fix [trf]
@@ -330,6 +418,10 @@ RenderFrontendBase::SceneId RenderFrontendBase::CreateScene(SceneData& shd, POVM
                 shd.searchpaths.push_back(Path(str));
             }
         }
+
+        // decided by the job's first scene; an animation sets up a scene for each frame
+        shd.builtinIncludes = builtinIncludes;
+        builtinIncludes->Decide(obj.TryGetBool(kPOVAttrib_BuiltinIncludes, true), shd.searchpaths);
 
         return SceneId(backendaddress, result.GetInt(kPOVAttrib_SceneId));
     }

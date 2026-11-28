@@ -45,15 +45,11 @@
 #include <string>
 
 // POV-Ray header files (base module)
+#include "base/builtinfiles.h"
 #include "base/fileinputoutput.h"
 #include "base/path.h"
+#include "base/pov_err.h"
 #include "base/stringutilities.h"
-
-// All the builtin fonts must be declared here
-#include "base/font/crystal.h"
-#include "base/font/cyrvetic.h"
-#include "base/font/povlogo.h"
-#include "base/font/timrom.h"
 
 // this must be the last file included
 #include "base/povdebug.h"
@@ -234,13 +230,23 @@ int InferFileTypeFromExt(const UCS2String& ext)
  */
 IStream *Internal_Font_File(int font_id)
 {
+    const char *name;
+
     switch(font_id)
     {
-        case 1:     return new IMemStream(&font_timrom[0],   sizeof(font_timrom),   "timrom.ttf");
-        case 2:     return new IMemStream(&font_cyrvetic[0], sizeof(font_cyrvetic), "cyrvetic.ttf");
-        case 3:     return new IMemStream(&font_crystal[0],  sizeof(font_crystal),  "crystal.ttf");
-        default:    return new IMemStream(&font_povlogo[0],  sizeof(font_povlogo),  "povlogo.ttf");
+        case 1:     name = "timrom.ttf";    break;
+        case 2:     name = "cyrvetic.ttf";  break;
+        case 3:     name = "crystal.ttf";   break;
+        default:    name = "povlogo.ttf";   break;
     }
+
+    // the fonts are among the built-in standard include files (see base/builtinfiles.h),
+    // whatever the render's use of those for files named in the scene
+    const BuiltinFileEntry *entry = FindBuiltinFile(ASCIItoUCS2String(name));
+    if (entry == nullptr)
+        throw POV_EXCEPTION(kCannotOpenFileErr, std::string("Internal font '") + name + "' is not built into this program.");
+
+    return OpenBuiltinFile(*entry);
 }
 
 //******************************************************************************
