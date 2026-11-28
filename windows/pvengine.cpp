@@ -90,6 +90,7 @@
 #include "backend/control/benchmark.h"
 #include "pvdisplay.h"
 #include "backend/povray.h"
+#include "backend/support/processorGroups.h"
 
 #ifdef RTR_SUPPORT
 #include "rtrsupport.h"
@@ -5124,7 +5125,7 @@ void GenerateDumpMeta(bool brief)
     s += sprintf(s, "installdate=%s\n", InstalledOn) ;
   }
   s += sprintf(s, "cpuarchitecture=%u\n", (DWORD) sysinfo.wProcessorArchitecture) ;
-  s += sprintf(s, "numberofcpus=%u\n", sysinfo.dwNumberOfProcessors) ;
+  s += sprintf(s, "numberofcpus=%u\n", processorGroups::GetNumberOfProcessors()) ;
   s += sprintf(s, "processortype=%u\n", sysinfo.dwProcessorType) ;
   s += sprintf(s, "processorlevel=%u\n", (DWORD) sysinfo.wProcessorLevel) ;
   s += sprintf(s, "processorrevision=%u\n", (DWORD) sysinfo.wProcessorRevision) ;
@@ -5431,10 +5432,8 @@ int PASCAL WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 
   hInstance = hInst ;
   hMainThread = GetCurrentThread () ;
-
-  GetSystemInfo (&sysinfo) ;
-  ThreadCount = sysinfo.dwNumberOfProcessors ;
-  NumberOfCPUs = sysinfo.dwNumberOfProcessors ;
+  
+  ThreadCount = NumberOfCPUs = processorGroups::GetNumberOfProcessors();
 
   while (*s == ' ' || *s == '\t')
     s++ ;

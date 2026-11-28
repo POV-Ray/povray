@@ -413,6 +413,7 @@
     <ClCompile Include="..\..\source\backend\render\rendertask.cpp" />
     <ClCompile Include="..\..\source\backend\render\tracetask.cpp" />
     <ClCompile Include="..\..\source\backend\scene\view.cpp" />
+    <ClCompile Include="..\..\source\backend\support\processorGroups.cpp" />
     <ClCompile Include="..\..\source\backend\support\task.cpp" />
     <ClCompile Include="..\..\source\backend\support\taskqueue.cpp" />
     <ClCompile Include="..\..\source\backend\lighting\photonestimationtask.cpp" />
@@ -452,6 +453,7 @@
     <ClInclude Include="..\..\source\backend\scene\view.h" />
     <ClInclude Include="..\..\source\backend\scene\viewthreaddata_fwd.h" />
     <ClInclude Include="..\..\source\backend\scene\view_fwd.h" />
+    <ClInclude Include="..\..\source\backend\support\processorGroups.h" />
     <ClInclude Include="..\..\source\backend\support\task.h" />
     <ClInclude Include="..\..\source\backend\support\taskqueue.h" />
     <ClInclude Include="..\..\source\backend\lighting\photonestimationtask.h" />
