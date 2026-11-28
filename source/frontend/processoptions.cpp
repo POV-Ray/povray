@@ -183,7 +183,13 @@ int ProcessOptions::ParseFile(const char *filespec, POVMSObjectPtr obj)
                             }
                         }
                         else
+                        {
+                            // a bare word such as `../scene.pov` is read whole below, so put its first
+                            // character back; a comma, `=`, `]` or a control character is still skipped
+                            if((token > ' ') && (token != 127) && (token != ',') && (token != '=') && (token != ']'))
+                                file->ungetchar(token);
                             err = kFalseErr;
+                        }
                         break;
                 }
 

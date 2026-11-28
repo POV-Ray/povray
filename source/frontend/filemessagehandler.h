@@ -47,6 +47,7 @@
 
 // POV-Ray header files (base module)
 #include "base/path_fwd.h"
+#include "base/stringtypes.h"
 
 // POV-Ray header files (POVMS module)
 #include "povms/povmscpp.h"
@@ -65,11 +66,22 @@ class FileMessageHandler
 
         void HandleMessage(const SceneData&, POVMSType, POVMS_Object&, POVMS_Object&);
     protected:
-        virtual bool FindFile(const std::list<pov_base::Path>&, POVMS_Object&, POVMS_Object&);
-        virtual bool ReadFile(const std::list<pov_base::Path>&, POVMS_Object&, POVMS_Object&);
+        virtual bool FindFile(const std::list<pov_base::Path>&, const pov_base::Path&, const pov_base::UCS2String&, POVMS_Object&, POVMS_Object&);
+        virtual bool ReadFile(const std::list<pov_base::Path>&, const pov_base::Path&, const pov_base::UCS2String&, POVMS_Object&, POVMS_Object&);
         virtual void CreatedFile(POVMS_Object&);
 
-        pov_base::Path FindFilePath(const std::list<pov_base::Path>&, const pov_base::Path&);
+        /// Looks for a file named in a scene.
+        ///
+        /// The name is tried as given (i.e. relative to the current working directory, or as
+        /// an absolute path), then, if it is relative, in the scene file's directory, and then
+        /// in each library path in turn.
+        ///
+        /// @param  lps         Library paths.
+        /// @param  scenepath   Directory of the scene file, as given (may be empty).
+        /// @param  f           Name of the file to look for.
+        /// @return             Path to the file, or an empty path if not found.
+        ///
+        pov_base::Path FindFilePath(const std::list<pov_base::Path>& lps, const pov_base::Path& scenepath, const pov_base::Path& f);
 };
 
 }

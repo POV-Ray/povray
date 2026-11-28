@@ -90,6 +90,7 @@ enum
     POV_File_Data_LOG,
     POV_File_Data_Backup,
     POV_File_Font_TTF,
+    POV_File_Data_Photons,
     POV_File_Count
 };
 
@@ -230,7 +231,9 @@ OStream *NewOStream(const Path&, unsigned int, bool);
 UCS2String GetFileExtension(const Path& p); ///< @todo Move this to the @ref Path class.
 UCS2String GetFileName(const Path& p);      ///< @todo Move this to the @ref Path class.
 
-bool CheckIfFileExists(const Path& p);      ///< @todo Move this to the @ref PlatformBase class.
+/// Tells whether a file exists and can be opened for reading; a directory does not count.
+/// @todo Move this to the @ref PlatformBase class.
+bool CheckIfFileExists(const Path& p);
 POV_OFF_T GetFileLength(const Path& p);     ///< @todo Move this to the @ref PlatformBase class.
 
 /// @}

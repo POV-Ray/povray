@@ -791,6 +791,12 @@ const char *vfeSession::GetErrorString(int code) const
   if (code == -1)
     code = m_LastError;
 
+  // negative codes are POV-Ray error codes, which reach m_LastError only from an
+  // exception caught by SetOptions() or StartRender(); its text says more than
+  // the code would.
+  if ((code < 0) && (m_LastExceptionText.empty() == false))
+    return m_LastExceptionText.c_str();
+
   switch (code)
   {
     case vfeNoError:

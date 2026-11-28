@@ -46,9 +46,10 @@
 #include <vector>
 
 // POV-Ray header files (base module)
-#include "core/lighting/photons_fwd.h"
+#include "base/fileinputoutput_fwd.h"
 
 // POV-Ray header files (core module)
+#include "core/lighting/photons_fwd.h"
 #include "core/render/trace.h"
 
 // POV-Ray header files (backend module)
@@ -80,6 +81,8 @@ class PhotonSortingTask final : public RenderTask
         void sortPhotonMap();
         bool save();
         bool load();
+        bool saveMap(pov_base::OStream& f, PhotonMap& map, const char *emptyMessage);
+        bool loadMap(pov_base::IStream& f, PhotonMap& map, int numph);
     private:
         class CooperateFunction final : public Trace::CooperateFunctor
         {

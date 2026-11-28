@@ -37,8 +37,10 @@
 #include "backend/control/renderbackend.h"
 
 // C++ variants of C standard header files
-// C++ standard header files
 //  (none at the moment)
+
+// C++ standard header files
+#include <new>
 
 // POV-Ray header files (base module)
 #include "base/pov_err.h"
@@ -116,6 +118,18 @@ void RenderBackend::SendViewOutput(ViewId vid, POVMSAddress addr, POVMSType iden
     POVMS_SendMessage(RenderBackend::context, msg, nullptr, kPOVMSSendMode_NoReply); // POVMS context provide for source address access only!
 }
 
+// The front-end answers a find or read request with an error number and text if the
+// request itself failed (e.g. a file name that is not a valid path), as distinct from
+// the file not being found. Report that error where the request was made.
+static void ThrowFileAccessError(POVMS_Message& result)
+{
+    if (result.Exist(kPOVAttrib_ErrorNumber) == false)
+        return;
+    if (result.GetInt(kPOVAttrib_ErrorNumber) == kOutOfMemoryErr)
+        throw std::bad_alloc();
+    throw POV_EXCEPTION(result.GetInt(kPOVAttrib_ErrorNumber), result.TryGetString(kPOVAttrib_EnglishText, "File access failed."));
+}
+
 void RenderBackend::SendFindFile(POVMSContext ctx, SceneId sid, POVMSAddress addr, const std::vector<POVMSUCS2String>& filenames, POVMSUCS2String& filename)
 {
     POVMS_Message msg(kPOVObjectClass_FileData, kPOVMsgClass_FileAccess, kPOVMsgIdent_FindFile);
@@ -135,6 +149,8 @@ void RenderBackend::SendFindFile(POVMSContext ctx, SceneId sid, POVMSAddress add
 
     POVMS_SendMessage(ctx, msg, &result, kPOVMSSendMode_WaitReply);
 
+    ThrowFileAccessError(result);
+
     filename = result.TryGetUCS2String(kPOVAttrib_ReadFile, "");
 }
 
@@ -149,6 +165,8 @@ void RenderBackend::SendReadFile(POVMSContext ctx, SceneId sid, POVMSAddress add
     msg.SetDestinationAddress(addr);
 
     POVMS_SendMessage(ctx, msg, &result, kPOVMSSendMode_WaitReply);
+
+    ThrowFileAccessError(result);
 
     localfile = result.TryGetUCS2String(kPOVAttrib_LocalFile, "");
     fileurl = result.TryGetUCS2String(kPOVAttrib_FileURL, "");

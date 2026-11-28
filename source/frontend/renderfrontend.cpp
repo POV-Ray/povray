@@ -214,7 +214,8 @@ RenderFrontendBase::SceneId RenderFrontendBase::CreateScene(SceneData& shd, POVM
 
     if(result.GetIdentifier() == kPOVMsgIdent_Done)
     {
-        shd.scenepath = Path(obj.TryGetUCS2String(kPOVAttrib_InputFile, ""));
+        shd.inputfile = obj.TryGetUCS2String(kPOVAttrib_InputFile, "");
+        shd.scenepath = Path(shd.inputfile);
         shd.scenepath.SetFile("");
 
         shd.outputpath = Path(obj.TryGetUCS2String(kPOVAttrib_OutputPath, ""));
