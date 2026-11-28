@@ -1426,11 +1426,8 @@ void Parser::Parse_User_Defined_Camera (Camera& Cam)
             {
                 for(unsigned int i = 0; i < 3; ++i)
                 {
-                    if (Cam.Location_Fn[i] != nullptr)
-                    {
-                        delete Cam.Location_Fn[i];
-                        Cam.Location_Fn[i] = nullptr;
-                    }
+                    delete Cam.Location_Fn[i];
+                    Cam.Location_Fn[i] = nullptr;
                 }
                 Parse_Vector(Cam.Location);
             }
@@ -1447,11 +1444,8 @@ void Parser::Parse_User_Defined_Camera (Camera& Cam)
             {
                 for(unsigned int i = 0; i < 3; ++i)
                 {
-                    if (Cam.Direction_Fn[i] != nullptr)
-                    {
-                        delete Cam.Direction_Fn[i];
-                        Cam.Direction_Fn[i] = nullptr;
-                    }
+                    delete Cam.Direction_Fn[i];
+                    Cam.Direction_Fn[i] = nullptr;
                 }
                 Parse_Vector(Cam.Direction);
             }
@@ -6654,8 +6648,7 @@ void Parser::Parse_Default ()
         CASE (FINISH_TOKEN)
             Local_Finish = Copy_Finish((Default_Texture->Finish));
             Parse_Finish (&Local_Finish);
-            if (Default_Texture->Finish)
-                delete Default_Texture->Finish;
+            delete Default_Texture->Finish;
             Default_Texture->Finish = Local_Finish;
         END_CASE
 

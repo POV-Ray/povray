@@ -193,7 +193,7 @@ class ObjectBase
 #endif
 
         /// Construct object from scratch.
-        ObjectBase(int t) :
+        explicit ObjectBase(int t) :
             Type(t),
             Texture(nullptr), Interior_Texture(nullptr), interior(), Trans(nullptr),
             Ph_Density(0), RadiosityImportance(0.0), RadiosityImportanceSet(false), Flags(0)

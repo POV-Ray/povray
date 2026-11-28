@@ -116,11 +116,8 @@ void RadiosityTask::Run()
         RadiosityBlockInfo* pBlockInfo = dynamic_cast<RadiosityBlockInfo*>(pInfo);
         if (!pBlockInfo)
         {
-            if (pInfo)
-            {
-                delete pInfo;
-                pInfo = nullptr;
-            }
+            delete pInfo;
+            pInfo = nullptr;
             pBlockInfo = new RadiosityBlockInfo();
         }
 

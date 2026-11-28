@@ -687,8 +687,7 @@ TNORMAL *Copy_Tnormal (TNORMAL *Old)
 
 void Destroy_Tnormal(TNORMAL *Tnormal)
 {
-    if (Tnormal != nullptr)
-        delete Tnormal;
+    delete Tnormal;
 }
 
 
