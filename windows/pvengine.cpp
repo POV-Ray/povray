@@ -10,7 +10,7 @@
 /// @parblock
 ///
 /// Persistence of Vision Ray Tracer ('POV-Ray') version 3.8.
-/// Copyright 1991-2017 Persistence of Vision Raytracer Pty. Ltd.
+/// Copyright 1991-2021 Persistence of Vision Raytracer Pty. Ltd.
 ///
 /// POV-Ray is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -33,6 +33,8 @@
 ///
 /// @endparblock
 ///
+//------------------------------------------------------------------------------
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //******************************************************************************
 
 /// @file
@@ -93,6 +95,7 @@
 #endif
 
 #include "cpuid.h"
+#include "syspovctime.h"
 
 #ifdef TRY_OPTIMIZED_NOISE
 // TODO - This is a hack; we should get the noise generator choice information via POVMS from the back-end.
@@ -776,8 +779,10 @@ void PrintRenderTimes (int Finished, int NormalCompletion)
           char fn[_MAX_PATH];
           char ts[256];
           time_t t = time(NULL);
-
-          strftime(ts, sizeof(ts), "%Y%m%d.%H%M%S", gmtime(&t));
+          std::tm tm;
+          _locale_t loc = _create_locale(LC_TIME, "C");
+          (void)pov_base::safe_gmtime(&t, &tm);
+          _strftime_l(ts, sizeof(ts), "%Y%m%d.%H%M%S", &tm, loc);
           sprintf(fn, "%sbenchmark-%s.txt", DocumentsPath, ts);
           FILE *f = fopen(fn, "wt");
           if (f != NULL)
@@ -785,7 +790,7 @@ void PrintRenderTimes (int Finished, int NormalCompletion)
             int n = Get_Benchmark_Version();
 
             fprintf(f, "%s", str);
-            strftime(str, sizeof(str), "%#c", gmtime(&t));
+            _strftime_l(str, sizeof(str), "%#c", &tm, loc);
             fprintf(f, "\nRender of benchmark version %x.%02x completed at %s UTC.\n", n / 256, n % 256, str);
             fprintf(f, "----------------------------------------------------------------------------\n");
             GenerateDumpMeta(true);

@@ -33,6 +33,8 @@
 ///
 /// @endparblock
 ///
+//------------------------------------------------------------------------------
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //******************************************************************************
 
 // Unit header file must be the first file included within POV-Ray *.cpp files (pulls in config)
@@ -304,6 +306,7 @@ const RESERVED_WORD Reserved_Words[] = {
     { LN_TOKEN,                     "ln" },
     { LOAD_FILE_TOKEN,              "load_file" },
     { LOCAL_TOKEN,                  "local" },
+    { LOCAL_TIME_TOKEN,             "local_time",               380 },
     { LOCATION_TOKEN,               "location" },
     { LOG_TOKEN,                    "log" },
     { LOOK_AT_TOKEN,                "look_at" },
